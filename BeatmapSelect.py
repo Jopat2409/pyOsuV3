@@ -30,6 +30,9 @@ class gsBeatmapSelect:
 
         # hard coded number representing how many beatmaps are shown on screen at once
         self.BMS = 7
+        self.bmHeight = 70
+        self.bmMargin = 10
+        self.bmOffset = 15
 
         if os.path.isfile(cPath):
             with open(cPath, 'r') as file:
@@ -37,16 +40,15 @@ class gsBeatmapSelect:
         else:
             for beatmap in os.listdir("%s/beatmaps/"%config.DEFAULT_PATH):
                 PATH = "%s\\beatmaps\\%s"%(config.DEFAULT_PATH, beatmap)
-                beatmapTemp = []
                 for diff in glob.glob(PATH + "/" + "*.osu"):
                     
-                    beatmapTemp.append(BeatmapParse.shallowRead(diff))
+                    self.beatmaps.append(BeatmapParse.shallowRead(diff))
 
-                self.beatmaps.append(beatmapTemp)
 
-        print(self.beatmaps)
         # points to the current index of the beatmap currently selected
         self.cBeatmap = random.randint(0, len(self.beatmaps))
+        print(len(self.beatmaps))
+        print(self.cBeatmap)
 
 
     def update(self):
@@ -64,9 +66,14 @@ class gsBeatmapSelect:
                 cData = self.beatmaps[beatmap]
             except IndexError:
                 break
-        pygame.draw.rect(surface, )
+            tempPos = self.bmMargin*(drawCount+1) + self.bmHeight*drawCount
+            if beatmap != self.cBeatmap:
+                tempRect = (0 + self.bmOffset, tempPos,config.SCREEN_RESOLUTION[0] / 3 + self.bmOffset, self.bmHeight)
+            else:
+                tempRect = (0, tempPos,config.SCREEN_RESOLUTION[0] / 3, self.bmHeight)
+            pygame.draw.rect(surface, (0,(30*(drawCount+1))%255,0),tempRect)
 
-        drawCount += 1
+            drawCount += 1
 
             
 
@@ -78,6 +85,7 @@ class gsBeatmapSelect:
 
         tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
         tempSurface.blit(self.bgIMG, (0,0))
+        tempSurface.fill((150,150,150))
 
         beatmapFrame = pygame.Surface((config.SCREEN_RESOLUTION[0] / 3, config.SCREEN_RESOLUTION[1]))
 

@@ -107,6 +107,7 @@ class gsMenu:
 
         tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
         tempSurface.blit(self.bgIMG, (0,0))
+        tempSurface.fill((150,150,150))
 
         for _object in self.buttons:
             _object.render(tempSurface)
