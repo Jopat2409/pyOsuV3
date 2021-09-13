@@ -14,9 +14,11 @@ class gameStateManager:
     def __init__(self):
 
 
+        # sets the initial gamestate to the main menu
         self.cGamestate = MainMenu.gsMenu(self)
-
+        # creates the stack used for storing paused gamestates
         self.gsStack = queue.LifoQueue()
+        # prevents the program from displaying the wrong res due to windows UI scaling
         ctypes.windll.user32.SetProcessDPIAware()
         
         self.GLOBAL_KEY_MAP = {"keyToggleChat":self.showChat,

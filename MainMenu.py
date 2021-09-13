@@ -99,7 +99,7 @@ class gsMenu:
 
     def buttonNotPressed(self):
         self.buttons[0].active = False
-    
+
 
         
 

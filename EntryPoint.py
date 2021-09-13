@@ -44,7 +44,7 @@ def startGame():
     config.DEFAULT_RESOLUTION = (640, 480)
     config.DEFAULT_PATH = os.path.dirname(os.path.realpath(__file__))
     config.SCREEN_RESOLUTION = (GetSystemMetrics(0), GetSystemMetrics(1))
-    print("path:" + os.path.dirname(os.path.realpath(__file__)))
+    #print("path:" + os.path.dirname(os.path.realpath(__file__)))
     # load all the user's default settings from the osu!.cfg
     loadSettings()
     # prevent the program from scaling due to windows default UI scaling
@@ -61,7 +61,7 @@ def startGame():
     
     pygame.init()
     pygame.mouse.set_visible(False)
-    print(config.keyBindings)
+    #print(config.keyBindings)
     # we import maingame here as many for the links to assets will not work without being initialized first
     import MainGame
     currentProcess = MainGame.osuGame()

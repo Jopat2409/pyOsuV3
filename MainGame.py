@@ -3,6 +3,7 @@ import config
 import time
 import sys
 import pygame
+import traceback
 
 
 
@@ -54,6 +55,21 @@ class osuGame():
                 except KeyError:
                     pass
             elif event.type == pygame.MOUSEBUTTONUP:
-                self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+                try:
+                    self.gsManager.cGamestate.mButtonUp()
+                except AttributeError:
+                    pass
+                try:
+                    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+                except:
+                    pass
+                
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                print("Mouse button prseeded own")
+                try:
+                    self.gsManager.cGamestate.mButtonDown()
+                except AttributeError:
+                    pass
+                    print(traceback.format_exc())
     
         
