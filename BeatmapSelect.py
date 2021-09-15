@@ -6,6 +6,8 @@ import glob
 import BeatmapParse
 import pygame
 import math
+import time
+import BeatmapPlay
 
 
 
@@ -20,10 +22,14 @@ class gsBeatmapSelect:
 
         self.parentClass = parentClass
 
+        # store a pointer to the sound handler
+        self.soundHandler = parentClass.soundStream
+
+        # array of beatmaps
         self.beatmaps = []
 
 
-
+        
         cPath = bgPath = config.DEFAULT_PATH + '/temp/beatmapSelect.obj'
         bgPath = config.DEFAULT_PATH + '/assets/bg/online_background_68261587a4e3fbe77cad07120ee1e864.jpg'
         bg = pygame.image.load(bgPath)
@@ -49,8 +55,12 @@ class gsBeatmapSelect:
         self.velY = 0
         self.decel = 1
         self.decelCount = 0
+        self.maxMouseMovement = 5
+
 
         self.font = pygame.font.SysFont('Arial', 25)
+
+        bmLoadStart = time.time()
 
         if os.path.isfile(cPath):
             with open(cPath, 'r') as file:
@@ -60,21 +70,24 @@ class gsBeatmapSelect:
                 PATH = "%s\\beatmaps\\%s"%(config.DEFAULT_PATH, beatmap)
                 for diff in glob.glob(PATH + "/" + "*.osu"):
                     
-                    self.beatmaps.append(BeatmapParse.shallowRead(diff))
-        print(self.beatmaps[0])
+                    self.beatmaps.append(BeatmapParse.shallowRead(diff,PATH))
         self.calculateBmBounds()
+        print("It took {}s to load all beatmaps".format(time.time()-bmLoadStart))
+        #print(self.beatmaps)
 
 
         # points to the current index of the beatmap currently selected
-        self.cBeatmap = random.randint(0, len(self.beatmaps))
+        self.cBeatmap = -1
         #print(len(self.beatmaps))
         #print(self.cBeatmap)
+        print(self.beatmaps)
 
     def mButtonDown(self):
 
         #print("Mouse pressed")
 
-        mX, mY = pygame.mouse.get_pos()
+        self.prevMousePos = pygame.mouse.get_pos()
+        mX, mY = self.prevMousePos
         if (mX > (config.SCREEN_RESOLUTION[0] / 3)*2) and mX < config.SCREEN_RESOLUTION[0]:
             self.scrolling = True
             self.prevMY = pygame.mouse.get_pos()[1]
@@ -92,17 +105,56 @@ class gsBeatmapSelect:
             self.beatmapBounds.append((0,(self.bmMargin*(drawCount+1) + self.bmHeight*drawCount), self.bmWidth, self.bmHeight))
             drawCount += 1
 
-        print(self.beatmapBounds)
             
         
 
     def mButtonUp(self):
 
         if self.scrolling:
+            tempX, tempY = pygame.mouse.get_pos()
+            mDiff = abs((tempX - self.prevMousePos[0])^2 + (tempY - self.prevMousePos[1])^2)
+            if mDiff <= self.maxMouseMovement^2:
+                print("PRESSED BUTTON")
+                self.scrolling = False
+                self.decelerating = False
+                self.velY = 0
+
+                self.getBeatmap(tempY)
+                return
             self.scrolling = False
             self.decelerating = True
-            self.velY = math.ceil(self.velTotal / self.velCount)
+            try:
+                self.velY = math.ceil(self.velTotal / self.velCount)
+            except ZeroDivisionError:
+                pass
             #print(self.velY)
+
+        
+
+
+    def getBeatmap(self, mY):
+        bmCount = 0
+        print("getting beatmaps")
+        for beatmap in self.beatmapBounds:
+            bmOffset = beatmap[1] + self.offset
+            if mY >= bmOffset and mY <= (bmOffset + self.bmHeight):
+                if self.cBeatmap == bmCount:
+                    self.parentClass.suspendGamestate(BeatmapPlay.gsBeatmapPlayer(self.beatmaps[self.cBeatmap]))
+                else:
+                    self.cBeatmap = bmCount
+                    self.soundHandler.previewSong(self.beatmaps[bmCount]["BasePath"]+"/"+self.beatmaps[bmCount]["AudioFilename"],int(self.beatmaps[bmCount]["PreviewTime"]))
+                    PATH = os.path.join(self.beatmaps[bmCount]["BasePath"],self.beatmaps[bmCount]["BackgroundImage"])
+                    PATH = PATH.replace("\\","/")
+                    bg = pygame.image.load(PATH.strip())
+                    self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
+                return
+            bmCount += 1
+
+
+            
+
+        
+
 
     def update(self):
 
@@ -133,8 +185,9 @@ class gsBeatmapSelect:
         drawnbeatmaps = []
         drawCount = 0
 
-
+        bmNumber = -1
         for beatmap in self.beatmapBounds:
+            bmNumber += 1
             # break out of for loop once all on screen beatmaps have been drawn
             if beatmap[1] + self.offset > config.SCREEN_RESOLUTION[1]:
                 break
@@ -142,9 +195,22 @@ class gsBeatmapSelect:
             if beatmap[1] + self.offset + self.bmHeight < 0:
                 continue
             # create the rectangle that will be drawn
-            tempRect = (beatmap[0], beatmap[1]+self.offset, beatmap[2], beatmap[3])
+            rectX = self.bmMargin
+            
+            if bmNumber != self.cBeatmap:
+                rectX += self.bmOffset
+
+
+            tempRect = (rectX, self.offset + beatmap[1], beatmap[2], beatmap[3])
             pygame.draw.rect(surface, (0,255,0),tempRect)
-            surface.blit(self.font.render(beatmap["Title"], True, (0,0,0)), (int(beatmap[0]), int(beatmap[1]+self.offset)))
+            try:
+                tempString = "{} [{}]".format(self.beatmaps[bmNumber]["Title"], self.beatmaps[bmNumber]["Version"])
+            except TypeError:
+                print(bmNumber)
+                print(self.beatmaps[bmNumber-1])
+                sys.exit(0)
+            surface.blit(self.font.render(tempString, True, (0,0,0)), (rectX, int(beatmap[1]+self.offset)))
+            
 
         
         
@@ -159,11 +225,13 @@ class gsBeatmapSelect:
 
         tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
         tempSurface.blit(self.bgIMG, (0,0))
-        tempSurface.fill((150,150,150))
+        #tempSurface.fill((150,150,150))
 
-        beatmapFrame = pygame.Surface((config.SCREEN_RESOLUTION[0] / 3, config.SCREEN_RESOLUTION[1]))
+        beatmapFrame = pygame.Surface((config.SCREEN_RESOLUTION[0] / 3, config.SCREEN_RESOLUTION[1]), pygame.SRCALPHA, 32)
+        beatmapFrame.convert_alpha()
+        
 
-        beatmapFrame.fill((0,0,0))
+        #beatmapFrame.fill((0,0,0))
         self.drawBeatmapRects(beatmapFrame)
 
         tempSurface.blit(beatmapFrame, ((config.SCREEN_RESOLUTION[0] / 3)*2,0))
