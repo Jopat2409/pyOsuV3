@@ -4,7 +4,7 @@ DEFAULT_PATH = ""
 keyBindings = {}
 currentSettings = {}
 
-
+safeMode = False
 
 # program entity ID generation
 
