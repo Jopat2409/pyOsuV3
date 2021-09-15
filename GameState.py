@@ -1,13 +1,15 @@
-
-
 import MainMenu
 import config
+import SoundHandler
+
 import queue
 import pygame
 import pygame.gfxdraw
 import ctypes
 
 
+
+# manages the current gamestate of the game
 class gameStateManager:
 
 
@@ -20,12 +22,17 @@ class gameStateManager:
         self.gsStack = queue.LifoQueue()
         # prevents the program from displaying the wrong res due to windows UI scaling
         ctypes.windll.user32.SetProcessDPIAware()
-        
+
+        # key functions that are applicable to all gamestates
         self.GLOBAL_KEY_MAP = {"keyToggleChat":self.showChat,
                                "keyToggleExtendedChat":self.showExtendedChat,
                                "keyScreenshot":self.screenshot}
 
+        # tracks wether chat is toggled ( applicable to all gamestates )
         self.chatToggle = False
+
+        # inializes the sound handler
+        self.soundStream = SoundHandler.audioStream()
 
         # uses fullscreen width if in fullscreen        
         if int(config.currentSettings["Fullscreen"]) == 1:
@@ -36,13 +43,18 @@ class gameStateManager:
 
 
     """hashes all relevant info about a gamestate, should be used when the time between resuming the gamestate is relatively large, or if the new gamestate
-    requires a large amount of processing power / memory
+    requires a larger amount of processing power / memory
     """
     def suspendGamestate(self, NEW_GAMESTATE):
+        # creates an obj file using the gamestate's UUID 
         filePath = config.DEFAULT_PATH + "/" + "%s.obj"%self.cGamestate.UUID
+        # opens the file
         file = open(filePath, 'w')
+        # uses pickle to write the gamestate to the file
         pickle.dump(self.cGamestate, file)
+        # adds the UUID to the stack
         self.gsStack.put(self.cGamestate.UUID)
+        # deletes the gamestate and updates the cGamestate
         del(self.cGamestate)
         self.cGamestate = NEW_GAMESTATE
 
@@ -51,12 +63,13 @@ class gameStateManager:
     """
     def pauseGamestate(self, NEW_GAMESTATE):
 
+        # add the last gamestate to the stack
         self.gsStack.put(self.cGamestate)
         del(self.cGamestate)
         self.cGamestate = NEW_GAMESTATE
 
 
-
+    """ Completely changes the gamestate, removing all information about the previous one"""
     def newGamestate(self, NEW_GAMESTATE):
 
         del(self.cGamestate)
@@ -65,16 +78,16 @@ class gameStateManager:
     """ delete the current gamestate and bring the last paused gamestate back to the current gamestate"""
     def resumeGamestate(self):
 
+        # gets the last paused gamestate
         tempGamestate = self.gsStack.pop()
-
+        # if the tempGamestate is a string then it must be a UUID, signifying a cached gamestate
         if temGamestate.isinstance(str):
+            # load the gamestate back up from the file
             filePath = config.DEFAULT_PATH + "/" + "%s.obj"%tempGamestate
             del(self.cGamestate)
             self.cGamestate = pickle.load(filePath)
             
-            # the paused gamestate has been suspended
         else:
-            # the paused gamestate has been pushed to one side
             del(self.cGamestate)
             self.cGamestate = tempGamestate
 
@@ -86,34 +99,40 @@ class gameStateManager:
             
 
     def render(self, interpolation):
-        
-        self.window.fill((255,255,255))
+
+        # blit the frame returned by the current gamestate's render method onto the main window
         self.window.blit(self.cGamestate.getRenderSnapshot(interpolation), (0,0))
+        # draw the chat popup if it is enabled
         if self.chatToggle:
             pygame.draw.rect(self.window,(0,0,0),(200,150,100,50))
-
+            
+        # render the cursor at the current mouse position
         mX, mY = pygame.mouse.get_pos()
-        pygame.gfxdraw.filled_circle(self.window, mX, mY, 20, (200,200,0))
+        pygame.gfxdraw.filled_circle(self.window, mX, mY, 20, (255,255,0))
+        # update the display
         pygame.display.update()
 
 
     def mapInput(self, inputs):
 
+        # loop through all of the key inputs
         for inputEvent in inputs:
 
             try:
+                # check the global key table for any functions to be called
                 self.GLOBAL_KEY_MAP[inputEvent]()
+                # check the current gamestate key table for functions to be called
                 self.cGamestate.KEY_MAP[inputEvent]()
             except KeyError:
                 pass
 
     def checkButtonBounds(self, pos):
-        print("Checking Bounds")
+        #print("Checking Bounds")
         for button in self.cGamestate.buttons:
             if button.checkBounds(pos):
                 return
 
-        print("no button pressed")
+        #print("no button pressed")
         try:
             self.cGamestate.buttonNotPressed()
         except AttributeError:
