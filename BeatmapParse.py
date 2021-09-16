@@ -16,7 +16,7 @@ def shallowRead(beatmapPath, basePath):
     with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:
 
         # add the path of the beatmap to the data
-        data.update({"BasePath":basePath})
+        data.update({"BasePath":basePath,"osuPath":beatmapPath})
 
         # loop through all the lines in the beatmap .osu
         for line in cBeatmap:
@@ -71,5 +71,28 @@ def shallowRead(beatmapPath, basePath):
 # reads the full file ready to be parsed
 def fullParse(beatmapPath):
 
+    reading = False
+    cSection = ""
 
-    print("Parse")
+    hitObjects = []
+
+    with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:
+
+        for line in cBeatmap:
+            tempSearch = re.search(r"\[([A-Za-z0-9_]+)\]", line)
+
+            try:
+                cSection = tempSearch.group(1)
+                continue
+            except:
+                pass
+
+            if cSection == "HitObjects":
+                hitObjects.append([i.strip() for i in line.split(",")])
+
+    return hitObjects
+
+            
+
+        
+    

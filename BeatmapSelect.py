@@ -28,6 +28,8 @@ class gsBeatmapSelect:
         # array of beatmaps
         self.beatmaps = []
 
+        self.UUID = "gsBeatmapSelect"
+
 
         
         cPath = bgPath = config.DEFAULT_PATH + '/temp/beatmapSelect.obj'
@@ -139,7 +141,7 @@ class gsBeatmapSelect:
             bmOffset = beatmap[1] + self.offset
             if mY >= bmOffset and mY <= (bmOffset + self.bmHeight):
                 if self.cBeatmap == bmCount:
-                    self.parentClass.suspendGamestate(BeatmapPlay.gsBeatmapPlayer(self.beatmaps[self.cBeatmap]))
+                    self.parentClass.pauseGamestate(BeatmapPlay.gsBeatmapPlayer(self.beatmaps[self.cBeatmap], self.parentClass))
                 else:
                     self.cBeatmap = bmCount
                     self.soundHandler.previewSong(self.beatmaps[bmCount]["BasePath"]+"/"+self.beatmaps[bmCount]["AudioFilename"],int(self.beatmaps[bmCount]["PreviewTime"]))
@@ -225,7 +227,8 @@ class gsBeatmapSelect:
 
         tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
         tempSurface.blit(self.bgIMG, (0,0))
-        #tempSurface.fill((150,150,150))
+        if config.safeMode:
+            tempSurface.fill((150,150,150))
 
         beatmapFrame = pygame.Surface((config.SCREEN_RESOLUTION[0] / 3, config.SCREEN_RESOLUTION[1]), pygame.SRCALPHA, 32)
         beatmapFrame.convert_alpha()
