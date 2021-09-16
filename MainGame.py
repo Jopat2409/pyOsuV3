@@ -13,7 +13,7 @@ class osuGame():
     def __init__(self):
 
         # defines how many times per second the game updates
-        self.MS_PER_UPDATE = 1/60
+        self.MS_PER_UPDATE = 1/500
 
         # initializes the class used for managing the current game state
         self.gsManager = GameState.gameStateManager()
