@@ -6,6 +6,8 @@ import queue
 import pygame
 import pygame.gfxdraw
 import ctypes
+import pickle
+import copy
 
 
 
@@ -50,12 +52,13 @@ class gameStateManager:
         filePath = config.DEFAULT_PATH + "/" + "%s.obj"%self.cGamestate.UUID
         # opens the file
         file = open(filePath, 'w')
+        tempGstate = copy.deepcopy(self.cGamestate)
         # uses pickle to write the gamestate to the file
-        pickle.dump(self.cGamestate, file)
+        pickle.dump(tempGstate, file)
         # adds the UUID to the stack
-        self.gsStack.put(self.cGamestate.UUID)
+        self.gsStack.put(filePath)
         # deletes the gamestate and updates the cGamestate
-        del(self.cGamestate)
+        del(self.cGamestate,tempGstate)
         self.cGamestate = NEW_GAMESTATE
 
 
