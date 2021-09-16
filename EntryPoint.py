@@ -90,4 +90,7 @@ def startGame():
     
 # start the whole program if this file is directly ran
 if __name__ == "__main__":
+    ans = str(input("Run in safe mode? y/n "))
+    if ans == "y":
+        config.safeMode = True
     startGame()
