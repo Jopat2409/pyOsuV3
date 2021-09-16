@@ -35,6 +35,11 @@ class audioStream:
         self.musicChannel.load(songFile)
         # play the song at the offset specified in the osu file, and make it loop infinitely
         self.musicChannel.play(start=offset/1000,loops=-1)
+
+    def playSong(self, songFile):
+
+        self.musicChannel.load(songFile)
+        self.musicChannel.play()
         
 
         
