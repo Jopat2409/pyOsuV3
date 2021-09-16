@@ -30,8 +30,16 @@ class osuGame():
         # initialized the prevTime and lag variables
         prevTime = time.time()
         lag = 0.0
-        
+        frames = 0
+        updates = 0
+        pTime = time.perf_counter()
         while(self.running):
+            if time.perf_counter() - pTime >= 1:
+                print("{} frames per second".format(frames))
+                print("{} updates per second".format(updates))
+                frames = 0
+                updates = 0
+                pTime = time.perf_counter()
             # calculate the time taken for the last loop
             cTime = time.time()
             elapsedTime = cTime - prevTime
@@ -43,8 +51,10 @@ class osuGame():
             while lag >= self.MS_PER_UPDATE:
                 self.gsManager.update()
                 lag -= self.MS_PER_UPDATE
+                updates += 1
             # render's the game as many times as possible per second, passing the time between updates to the renderer for linear interpolation
             self.gsManager.render(lag/self.MS_PER_UPDATE)
+            frames += 1
 
         # exits when the program is done
         sys.exit(0)
