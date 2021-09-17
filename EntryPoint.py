@@ -54,6 +54,7 @@ def getOsuPixelScaling():
 
 
 def startGame():
+
     # prevent the program from scaling due to windows default UI scaling
     ctypes.windll.user32.SetProcessDPIAware()
     # set osu's default resolution
@@ -64,9 +65,6 @@ def startGame():
     config.SCREEN_RESOLUTION = (GetSystemMetrics(0), GetSystemMetrics(1))
     #print("path:" + os.path.dirname(os.path.realpath(__file__)))
     # load all the user's default settings from the osu!.cfg
-    loadSettings()
-    
-    
     # pygame v2 or higher is needed for a lot of the functions within this program
     # no pygame, no run
     try:
@@ -75,8 +73,12 @@ def startGame():
             print("You do not have the correct version of pygame installed")
             return
     except ModuleNotFoundError:
-        print("You do not have pygame installed you dummy")
+        print("You do not have pygame installed. Terminating program...")
         return
+    loadSettings()
+    
+    
+    
     
     pygame.init()
     # set the mouse cursor to invisible due to the program using it's own cursor

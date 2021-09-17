@@ -27,6 +27,8 @@ class gsBeatmapPlayer:
         bg = pygame.image.load(PATH.strip())
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
 
+        self.cFont = pygame.font.SysFont('Arial', 40)
+
 
     def getMapValues(self):
 
@@ -41,7 +43,13 @@ class gsBeatmapPlayer:
             self.fadeInTime = 800 - 500*((int(self.playingBeatmap["ApproachRate"])-5)/5)
             self.fadeInStart = 1200 - 750*((int(self.playingBeatmap["ApproachRate"])-5)/5)
 
-        self.radius = 75
+        self.radius = int(config.CURRENT_SCALING*(54.4-4.48*int(self.playingBeatmap["CircleSize"])))
+        self.innerRadius = int(self.radius*0.9)
+        self.hCircleRadius = self.radius*2
+
+        self.xOffset = int((config.SCREEN_RESOLUTION[0] - config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING)/2)
+
+        print("X offset: {}".format(self.xOffset))
 
 
 
@@ -49,19 +57,30 @@ class gsBeatmapPlayer:
 
         tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
         tempSurface.blit(self.bgIMG, (0,0))
-        if config.safeMode: 
-            tempSurface.fill((0,0,0))
+        tempSurface.fill((0,0,0))
 
-        
+        combo = 0
         for hitObject in self.hitObjects:
-            if self.soundHandler.musicChannel.get_pos()+self.fadeInStart >= int(hitObject[2]):
-                alpha =  255 / self.fadeInTime * (self.soundHandler.musicChannel.get_pos() - (int(hitObject[2]) - self.fadeInStart))
+            combo += 1
+            cPos = self.soundHandler.musicChannel.get_pos()
+            if cPos+self.fadeInStart >= int(hitObject[2]):
+                alpha =  255 / self.fadeInTime * (cPos - (int(hitObject[2]) - self.fadeInStart))
                 if alpha >= 255:
                     alpha = 255
-              
-                pygame.gfxdraw.filled_circle(tempSurface, int(int(hitObject[0])*config.CURRENT_SCALING), int(int(hitObject[1])*config.CURRENT_SCALING), 76, (255,255,255,alpha))
-                pygame.gfxdraw.filled_circle(tempSurface, int(int(hitObject[0])*config.CURRENT_SCALING), int(int(hitObject[1])*config.CURRENT_SCALING), 70, (255,0,0,alpha))
 
+                aCircleRadius = self.radius + self.hCircleRadius * ((int(hitObject[2])-cPos) / self.fadeInStart)
+                cX = self.xOffset + int(int(hitObject[0])*config.CURRENT_SCALING)
+                cY = int(int(hitObject[1])*config.CURRENT_SCALING)
+              
+                pygame.gfxdraw.filled_circle(tempSurface, cX, cY, self.radius, (255,255,255))
+                pygame.gfxdraw.filled_circle(tempSurface, cX, cY, self.innerRadius, (0,0,0))
+                for i in range(0,5):
+                    pygame.gfxdraw.aacircle(tempSurface, cX, cY, int(aCircleRadius)+i, (255,255,255))
+                tempFont = self.cFont.render(str(hitObject[-1]), True, (255,255,255))
+                tempSurface.blit(tempFont, (cX-(tempFont.get_width() / 2), cY-(tempFont.get_height()/2)))
+            else:
+                break
+        
 
         return tempSurface
 

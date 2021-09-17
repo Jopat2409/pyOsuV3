@@ -75,6 +75,7 @@ def fullParse(beatmapPath):
     cSection = ""
 
     hitObjects = []
+    combo = 0
 
     with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:
 
@@ -88,7 +89,12 @@ def fullParse(beatmapPath):
                 pass
 
             if cSection == "HitObjects":
-                hitObjects.append([i.strip() for i in line.split(",")])
+                combo += 1
+                tempObj = [i.strip() for i in line.split(",")]
+                if int(tempObj[3]) == 2:
+                    combo = 1
+                tempObj.append(combo)
+                hitObjects.append(tempObj)
 
     return hitObjects
 
