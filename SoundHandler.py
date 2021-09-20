@@ -14,14 +14,21 @@ class audioStream:
         pygame.mixer.init()
 
         # create the two channels used for handling music and effects playing
-        self.effects = pygame.mixer.Channel(0)
+        self.effectChannel = pygame.mixer.Channel(0)
         self.musicChannel = pygame.mixer.music
 
         # dictionary mapping effects to their respective mp3's
         self.effects = {}
 
         # set the music volume to the volume saved in the config
-        self.musicChannel.set_volume(int(config.currentSettings["VolumeMusic"]) / 100)
+        self.musicChannel.set_volume(0.1)
+
+
+    def playEffect(self, effect):
+
+        effectSound = pygame.mixer.Sound(os.join(config.skinDirectory,self.effects[effect]))
+
+        self.effectChannel.play(effectSound)
 
 
 

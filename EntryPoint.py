@@ -7,6 +7,7 @@ import ctypes
 from win32api import GetSystemMetrics
 import glob
 
+
 """
 This class is for the initialization of the game, setting default variables settings
 Since it is only ever called once there is no point in having it be a gamestate
@@ -35,6 +36,7 @@ def loadSettings():
                     config.currentSettings.update({cLine[0].strip():cLine[1].strip()})
     # set the scaling value which is used to scale osuPixel values
     config.CURRENT_SCALING = getOsuPixelScaling()
+    config.SCALED_RESOLUTION = (int(config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING), int(config.DEFAULT_RESOLUTION[1]*config.CURRENT_SCALING))
     #print(config.SCREEN_RESOLUTION)
     #print(config.CURRENT_SCALING)
 

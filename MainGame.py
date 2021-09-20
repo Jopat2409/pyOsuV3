@@ -20,6 +20,9 @@ class osuGame():
         # set's the game's running state to TRUE
         self.running = True
 
+        self.frames = 0
+        self.updates = 0
+
         # starts the game loop
         self.gameLoop()
 
@@ -35,8 +38,10 @@ class osuGame():
         pTime = time.perf_counter()
         while(self.running):
             if time.perf_counter() - pTime >= 1:
-                print("{} frames per second".format(frames))
-                print("{} updates per second".format(updates))
+                #print("{} frames per second".format(frames))
+                #print("{} updates per second".format(updates))
+                self.frames = frames
+                self.updates = updates
                 frames = 0
                 updates = 0
                 pTime = time.perf_counter()
@@ -51,9 +56,9 @@ class osuGame():
             while lag >= self.MS_PER_UPDATE:
                 self.gsManager.update()
                 lag -= self.MS_PER_UPDATE
-                updates += 1
+                self.updates += 1
             # render's the game as many times as possible per second, passing the time between updates to the renderer for linear interpolation
-            self.gsManager.render(lag/self.MS_PER_UPDATE)
+            self.gsManager.render(lag/self.MS_PER_UPDATE, self.frames)
             frames += 1
 
         # exits when the program is done
@@ -81,13 +86,13 @@ class osuGame():
                 try:
                     self.gsManager.cGamestate.mButtonUp()
                 except AttributeError:
-                    print(traceback.format_exc())
+                    #print(traceback.format_exc())
                     pass
                 # try to call the checkButtonBounds function which checks to see if any buttons were pressed
                 try:
                     self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
                 except:
-                    print(traceback.format_exc())
+                    #print(traceback.format_exc())
                     pass
                 
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -96,6 +101,6 @@ class osuGame():
                     self.gsManager.cGamestate.mButtonDown()
                 except AttributeError:
                     pass
-                    print(traceback.format_exc())
+                    #print(traceback.format_exc())
     
         

@@ -2,6 +2,8 @@
 
 import re
 
+import config
+
 
 # only reads the necessary data for viewing the beatmap not playing
 #returns a tuple containing (metadata, diff data, audiofile, bgfile)
@@ -91,10 +93,13 @@ def fullParse(beatmapPath):
             if cSection == "HitObjects":
                 combo += 1
                 tempObj = [i.strip() for i in line.split(",")]
+                tempHitObject = [int(int(tempObj[0])*config.CURRENT_SCALING), int(int(tempObj[1])*config.CURRENT_SCALING), int(tempObj[2])]
+                #print(tempHitObject)
+                
+                tempHitObject.append(combo)
+                hitObjects.append(tempHitObject)
                 if int(tempObj[3]) == 2:
-                    combo = 1
-                tempObj.append(combo)
-                hitObjects.append(tempObj)
+                    combo = 0
 
     return hitObjects
 

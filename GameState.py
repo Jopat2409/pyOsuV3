@@ -9,6 +9,9 @@ import ctypes
 import pickle
 import copy
 
+import traceback
+
+
 
 
 # manages the current gamestate of the game
@@ -35,6 +38,8 @@ class gameStateManager:
 
         # inializes the sound handler
         self.soundStream = SoundHandler.audioStream()
+
+        self.font = pygame.cFont = pygame.font.SysFont('Arial', 40)
 
         # uses fullscreen width if in fullscreen        
         if int(config.currentSettings["Fullscreen"]) == 1:
@@ -101,7 +106,7 @@ class gameStateManager:
         self.cGamestate.update()
             
 
-    def render(self, interpolation):
+    def render(self, interpolation, frames):
 
         # blit the frame returned by the current gamestate's render method onto the main window
         self.window.blit(self.cGamestate.getRenderSnapshot(interpolation), (0,0))
@@ -112,6 +117,12 @@ class gameStateManager:
         # render the cursor at the current mouse position
         mX, mY = pygame.mouse.get_pos()
         pygame.gfxdraw.filled_circle(self.window, mX, mY, 20, (255,255,0))
+        if frames >= 60:
+            color = (0,255,0)
+        else:
+            color = (255,0,0)
+        fps = self.font.render("{}".format(frames), True, color)
+        self.window.blit(fps, (500,1000))
         # update the display
         pygame.display.update()
 
@@ -120,11 +131,17 @@ class gameStateManager:
 
         # loop through all of the key inputs
         for inputEvent in inputs:
-
+            #print(inputEvent)
+            
             try:
                 # check the global key table for any functions to be called
                 self.GLOBAL_KEY_MAP[inputEvent]()
                 # check the current gamestate key table for functions to be called
+
+            except KeyError:
+                pass
+
+            try:
                 self.cGamestate.KEY_MAP[inputEvent]()
             except KeyError:
                 pass
