@@ -92,7 +92,7 @@ class gsBeatmapPlayer:
         for i in range(self.hitObjects):
             cObject = self.hitObjects[i]
             cPos = (cObject[0], cObject[1])
-            cTime = cObjecy[2]
+            cTime = cObject[2]
             pPos = (self.hitObjects[i-1][0], self.hitObjects[i-1][1])
             #pTime = 
 
