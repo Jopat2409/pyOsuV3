@@ -148,11 +148,11 @@ class gsBeatmapPlayer:
     def drawUnstableRateMarker(self, surface):
 
         for i in range(0,3):
-            tempSize = self.hitWindows[i]*2
+            tempSize = self.hitWindows[i]
             pygame.draw.rect(surface, self.timingColors[i], (int((config.SCREEN_RESOLUTION[0] - tempSize)/2),1000,tempSize, 30))
         
         for hitMark in self.hitTimings:
-            pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark*2, 950, 5, 100))
+            pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark, 950, 5, 100))
 
     def checkCircle(self):
 
