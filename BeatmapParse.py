@@ -62,14 +62,7 @@ def shallowRead(beatmapPath, basePath):
                 except:
                     pass
             
-
-
-
-
-
-
-
-
+            
 # reads the full file ready to be parsed
 def fullParse(beatmapPath):
 

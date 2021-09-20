@@ -89,7 +89,7 @@ class gameStateManager:
         # gets the last paused gamestate
         tempGamestate = self.gsStack.pop()
         # if the tempGamestate is a string then it must be a UUID, signifying a cached gamestate
-        if temGamestate.isinstance(str):
+        if tempGamestate.isinstance(str):
             # load the gamestate back up from the file
             filePath = config.DEFAULT_PATH + "/" + "%s.obj"%tempGamestate
             del(self.cGamestate)
