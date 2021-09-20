@@ -35,6 +35,8 @@ class gsBeatmapPlayer:
         self.missCount = 0
         self.score = 0
 
+        self.hitTimings = []
+
         self.soundHandler.playSong(self.playingBeatmap["BasePath"]+"/"+self.playingBeatmap["AudioFilename"])
 
 
@@ -79,11 +81,13 @@ class gsBeatmapPlayer:
                            (160-12*float(self.playingBeatmap["OverallDifficulty"]))/2]
 
         self.scoreWindows = [50,100,300]
-        print(self.hitWindows)
+        self.rectSize = int(config.SCREEN_RESOLUTION[0] / 3)
+        self.timingColors = [(255,0,0),(0,255,0),(0,0,255)]
+        #print(self.hitWindows)
 
         self.xOffset = int((config.SCREEN_RESOLUTION[0] - config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING)/2)
 
-        print("X offset: {}".format(self.xOffset))
+        #print("X offset: {}".format(self.xOffset))
 
 
     def drawFollowPoints(self):
@@ -136,9 +140,19 @@ class gsBeatmapPlayer:
                 break
         comboText = self.cFont.render("{}x".format(self.combo), True, (255,255,255))
         tempSurface.blit(comboText, (100,100))
+        self.drawUnstableRateMarker(tempSurface)
         
 
         return tempSurface
+    
+    def drawUnstableRateMarker(self, surface):
+
+        for i in range(0,3):
+            tempSize = self.hitWindows[i]*2
+            pygame.draw.rect(surface, self.timingColors[i], (int((config.SCREEN_RESOLUTION[0] - tempSize)/2),1000,tempSize, 30))
+        
+        for hitMark in self.hitTimings:
+            pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark*2, 950, 5, 100))
 
     def checkCircle(self):
 
@@ -181,6 +195,9 @@ class gsBeatmapPlayer:
             pass
         else:
             if self.checkCircle():
+                if len(self.hitTimings) >= 25:
+                    self.hitTimings.pop()
+                self.hitTimings.append(cDiff)
                 self.hitNote(max(scoresHit))
                 #print("hit note {}".format(max(scoresHit)))
             else:
