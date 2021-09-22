@@ -1,14 +1,15 @@
+""" ---------- OSU MODULES ---------- """
 import MainMenu
 import config
 import SoundHandler
 
+""" ---------- PYTHON MODULES ---------- """
 import queue
 import pygame
 import pygame.gfxdraw
 import ctypes
 import pickle
 import copy
-
 import traceback
 
 

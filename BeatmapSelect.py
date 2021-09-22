@@ -1,13 +1,15 @@
+
+import config
+import BeatmapParse
+import BeatmapPlay
+
 import random
 import pickle
 import os
-import config
 import glob
-import BeatmapParse
 import pygame
 import math
 import time
-import BeatmapPlay
 import sys
 
 
