@@ -76,9 +76,9 @@ class gsBeatmapPlayer:
         self.innerRadius = int(self.radius*0.9)
         self.hCircleRadius = self.radius*2
 
-        self.hitWindows = [(400-20*float(self.playingBeatmap["OverallDifficulty"]))/2,
-                           (280-16*float(self.playingBeatmap["OverallDifficulty"]))/2,
-                           (160-12*float(self.playingBeatmap["OverallDifficulty"]))/2]
+        self.hitWindows = [((400-20*float(self.playingBeatmap["OverallDifficulty"]))/2)+250,
+                           ((280-16*float(self.playingBeatmap["OverallDifficulty"]))/2)+250,
+                           ((160-12*float(self.playingBeatmap["OverallDifficulty"]))/2)+250]
 
         self.scoreWindows = [50,100,300]
         self.rectSize = int(config.SCREEN_RESOLUTION[0] / 3)
@@ -131,9 +131,9 @@ class gsBeatmapPlayer:
               
                 pygame.gfxdraw.filled_circle(tempSurface, cX, cY, self.radius, (255,255,255))
                 pygame.gfxdraw.filled_circle(tempSurface, cX, cY, self.innerRadius, (0,0,0))
-##                if aCircleRadius > self.radius:
-##                    for i in range(0,5):
-##                        pygame.gfxdraw.aacircle(tempSurface, cX, cY, aCircleRadius+i, (255,255,255))
+                if aCircleRadius > self.radius:
+                   for i in range(0,5):
+                       pygame.gfxdraw.aacircle(tempSurface, cX, cY, aCircleRadius+i, (255,255,255))
                 tempFont = self.cFont.render(str(hitObject[-1]), True, (255,255,255))
                 tempSurface.blit(tempFont, (cX-(tempFont.get_width() / 2), cY-(tempFont.get_height()/2)))
             else:
@@ -148,11 +148,11 @@ class gsBeatmapPlayer:
     def drawUnstableRateMarker(self, surface):
 
         for i in range(0,3):
-            tempSize = self.hitWindows[i]
+            tempSize = self.hitWindows[i]*2
             pygame.draw.rect(surface, self.timingColors[i], (int((config.SCREEN_RESOLUTION[0] - tempSize)/2),1000,tempSize, 30))
         
         for hitMark in self.hitTimings:
-            pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark, 950, 5, 100))
+            pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark*2, 950, 5, 100))
 
     def checkCircle(self):
 
