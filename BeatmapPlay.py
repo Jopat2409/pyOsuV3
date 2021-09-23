@@ -36,7 +36,8 @@ class gsBeatmapPlayer:
 
         # mapping all key presses to their respective functions
         self.KEY_MAP = {"keyOsuLeft":self.hasHitNextNote,
-                               "keyOsuRight":self.hasHitNextNote}
+                               "keyOsuRight":self.hasHitNextNote,
+                               "keyPause":self.pauseMap}
 
         # holds the value of the current combo held by the player
         self.combo = 0
@@ -48,6 +49,8 @@ class gsBeatmapPlayer:
         self.score = 0
         
         self.hitTimings = []
+
+        self.isPaused = False
 
         # plays the song and begins the beatmap
         self.soundHandler.playSong(self.playingBeatmap["BasePath"]+"/"+self.playingBeatmap["AudioFilename"])
@@ -71,7 +74,14 @@ class gsBeatmapPlayer:
         self.hitObjects.pop(0)
         
 
-        
+    def pauseMap(self):
+
+        self.isPaused = not self.isPaused
+        if self.isPaused:
+            self.soundHandler.pauseSong()
+        else:
+            self.soundHandler.resumeSong()
+
 
         
 
@@ -97,9 +107,11 @@ class gsBeatmapPlayer:
         self.hCircleRadius = self.radius*2
 
         # calculate the respective windows for scores, using the map's overall difficulty value
-        self.hitWindows = [((400-20*float(self.playingBeatmap["OverallDifficulty"]))/2)+250,
-                           ((280-16*float(self.playingBeatmap["OverallDifficulty"]))/2)+250,
-                           ((160-12*float(self.playingBeatmap["OverallDifficulty"]))/2)+250]
+        self.hitWindows = [((400-20*float(self.playingBeatmap["OverallDifficulty"]))/2)*10,
+                           ((280-16*float(self.playingBeatmap["OverallDifficulty"]))/2)*10,
+                           ((160-12*float(self.playingBeatmap["OverallDifficulty"]))/2)*10]
+        
+        print(self.hitWindows)
         
         self.scoreWindows = [50,100,300]
 
@@ -174,11 +186,11 @@ class gsBeatmapPlayer:
     def drawUnstableRateMarker(self, surface):
 
         for i in range(0,3):
-            tempSize = self.hitWindows[i]*2
-            pygame.draw.rect(surface, self.timingColors[i], (int((config.SCREEN_RESOLUTION[0] - tempSize)/2),1000,tempSize, 30))
+            tempSize = self.hitWindows[i]/2
+            pygame.draw.rect(surface, self.timingColors[i], (int((config.SCREEN_RESOLUTION[0] - tempSize)/2),1000,tempSize, 20))
         
         for hitMark in self.hitTimings:
-            pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark*2, 950, 5, 100))
+            pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark/2, 950, 2, 100))
 
     def checkCircle(self):
 
@@ -230,12 +242,13 @@ class gsBeatmapPlayer:
 
         # calculate the difference between the current position and the timing point
         cDiff = cPos - self.hitObjects[0][2]
+        self.hitTimings.append(cDiff)
 
         # if the mouse overlaps with the circle but the timing is within the miss timing point, return 0
-        if abs(cDiff) >= self.hitWindows[0] and abs(cDiff) <= self.hitWindows[0]+self.missMargin:
-            return 0
+        # if abs(cDiff) >= self.hitWindows[0] and abs(cDiff) <= self.hitWindows[0]+self.missMargin:
+        #     return 0
         # if the differenece is greater than the miss window, ignore
-        elif abs(cDiff) > self.hitWindows[0] + self.missMargin:
+        if abs(cDiff) > self.hitWindows[0] + self.missMargin:
             return None
 
         # work out which score value to assign to the player
@@ -251,7 +264,7 @@ class gsBeatmapPlayer:
 
     def update(self):
 
-        if int(self.hitObjects[0][2]) < self.soundHandler.musicChannel.get_pos():
+        if int(self.hitObjects[0][2])+self.hitWindows[0] < self.soundHandler.musicChannel.get_pos():
             self.missNote()
 
         

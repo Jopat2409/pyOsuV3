@@ -48,6 +48,15 @@ class audioStream:
 
         self.musicChannel.load(songFile)
         self.musicChannel.play()
+    
+
+    def pauseSong(self):
+
+        self.musicChannel.pause()
+
+    def resumeSong(self):
+
+        self.musicChannel.play()
         
 
         
