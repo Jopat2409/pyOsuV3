@@ -54,9 +54,11 @@ class audioStream:
 
         self.musicChannel.pause()
 
-    def resumeSong(self):
-
-        self.musicChannel.play()
+    def resumeSong(self, pTime=0):
+        if pTime == 0:
+            self.musicChannel.unpause()
+        else:
+            self.musicChannel.play(start=pTime/1000)
         
 
         

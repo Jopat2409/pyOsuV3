@@ -88,9 +88,9 @@ class gameStateManager:
     def resumeGamestate(self):
 
         # gets the last paused gamestate
-        tempGamestate = self.gsStack.pop()
+        tempGamestate = self.gsStack.get()
         # if the tempGamestate is a string then it must be a UUID, signifying a cached gamestate
-        if tempGamestate.isinstance(str):
+        if isinstance(tempGamestate, str):
             # load the gamestate back up from the file
             filePath = config.DEFAULT_PATH + "/" + "%s.obj"%tempGamestate
             del(self.cGamestate)

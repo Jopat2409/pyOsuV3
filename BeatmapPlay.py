@@ -10,7 +10,7 @@ class gsBeatmapPlayer:
 
 
     def __init__(self, PATH, parentClass):
-
+        self.tempPath = PATH
         # pointer to the parent class
         self.parent = parentClass
         # pointer to the sound handler used for playing music etc
@@ -19,6 +19,9 @@ class gsBeatmapPlayer:
         # load the data from the beatmap file which will be used to display and run the map
         self.playingBeatmap = PATH
         self.hitObjects = BeatmapParse.fullParse(self.playingBeatmap["osuPath"])
+
+        self.pausedTime = 0
+        self.offsetTime = 0
         #print(self.hitObjects)
 
         # calculate all necessary values for the map, such as relative circle size, approach rate in ms etc
@@ -38,6 +41,7 @@ class gsBeatmapPlayer:
         self.KEY_MAP = {"keyOsuLeft":self.hasHitNextNote,
                                "keyOsuRight":self.hasHitNextNote,
                                "keyPause":self.pauseMap}
+        self.buttonFunct = [self.pauseMap, self.retry, self.parent.resumeGamestate]
 
         # holds the value of the current combo held by the player
         self.combo = 0
@@ -72,15 +76,19 @@ class gsBeatmapPlayer:
         self.missCount += 1
         self.combo = 0
         self.hitObjects.pop(0)
-        
+
+    def getCurrentPos(self):
+        return self.soundHandler.musicChannel.get_pos() + self.offsetTime        
 
     def pauseMap(self):
-
+        cPos = self.getCurrentPos()
         self.isPaused = not self.isPaused
         if self.isPaused:
+            self.pausedTime = cPos
             self.soundHandler.pauseSong()
         else:
-            self.soundHandler.resumeSong()
+            self.offsetTime = self.pausedTime
+            self.soundHandler.resumeSong(self.pausedTime)
 
 
         
@@ -126,7 +134,30 @@ class gsBeatmapPlayer:
 
         # ms before the hit window begins in which a player misses if they try to hit the circle
         self.missMargin = 50
+        self.calcButtonBounds()
 
+    def retry(self):
+
+        self.__init__(self.tempPath, self.parent)
+
+    def mButtonUp(self):
+        mX, mY = pygame.mouse.get_pos()
+        if mX >= self.buttonBounds[0][0] and mX <= self.buttonBounds[0][2] + self.buttonBounds[0][0]:
+
+            funct = 0
+            for button in self.buttonBounds:
+                if mY >= button[1] and mY <= button[1] + button[3]:
+                    self.buttonFunct[funct]()
+                    break
+                funct += 1
+
+    def calcButtonBounds(self):
+
+        height = int(config.SCREEN_RESOLUTION[1] / 6)
+        width = int(config.SCREEN_RESOLUTION[0] / 3)
+        yVal = int((config.SCREEN_RESOLUTION[0] - width) / 2)
+        margin = int(height / 2)
+        self.buttonBounds = [(yVal, height+(height+margin)*i, width, height) for i in range(3)]
 
     def drawFollowPoints(self):
 
@@ -155,7 +186,7 @@ class gsBeatmapPlayer:
         combo = 0
         for hitObject in self.hitObjects:
             combo += 1
-            cPos = self.soundHandler.musicChannel.get_pos()
+            cPos = self.getCurrentPos()
             if cPos+self.fadeInStart >= hitObject[2]:
                 alpha =  255 / self.fadeInTime * (cPos - (hitObject[2] - self.fadeInStart))
                 if alpha >= 255:
@@ -178,7 +209,10 @@ class gsBeatmapPlayer:
                 break
         comboText = self.cFont.render("{}x".format(self.combo), True, (255,255,255))
         tempSurface.blit(comboText, (100,100))
-        self.drawUnstableRateMarker(tempSurface)
+        if self.isPaused:
+            self.drawPauseMenu(tempSurface)
+        else:
+            self.drawUnstableRateMarker(tempSurface)
         
 
         return tempSurface
@@ -191,6 +225,11 @@ class gsBeatmapPlayer:
         
         for hitMark in self.hitTimings:
             pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark/2, 950, 2, 100))
+    
+    def drawPauseMenu(self, surface):
+
+        for button in self.buttonBounds:
+            pygame.draw.rect(surface, config.PINK, button)
 
     def checkCircle(self):
 
@@ -236,7 +275,7 @@ class gsBeatmapPlayer:
 
 
         # get the current position in ms 
-        cPos = self.soundHandler.musicChannel.get_pos()
+        cPos = self.getCurrentPos()
 
         #print("Checking Timing Points")
 
@@ -263,8 +302,13 @@ class gsBeatmapPlayer:
 
 
     def update(self):
-
-        if int(self.hitObjects[0][2])+self.hitWindows[0] < self.soundHandler.musicChannel.get_pos():
-            self.missNote()
+        try:
+            if int(self.hitObjects[0][2])+self.hitWindows[2] < self.getCurrentPos():
+                self.missNote()
+        except IndexError:
+            pass
+        
+        if not self.soundHandler.musicChannel.get_busy() and not self.isPaused:
+            self.parent.resumeGamestate()
 
         

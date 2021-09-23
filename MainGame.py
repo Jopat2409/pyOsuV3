@@ -75,11 +75,11 @@ class osuGame():
             elif event.type == pygame.KEYUP:
                 # attempts to map the key pressed to the correct function via the instance variable keyBindings
                 try:
-                    self.gsManager.mapInput(config.keyBindings[pygame.key.name(event.key).upper()])
+                    self.gsManager.mapInput(config.keyBindings[pygame.key.name(event.key).capitalize()])
                     #print(config.keyBindings[pygame.key.name(event.key).upper()])
                 # if the current gamestate does not have a function for the key pressed, we do nothing
                 except KeyError:
-                    pass
+                    print(traceback.format_exc())
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 # try to call the mButtonUp function which is used for things that require mouse dragging etc
