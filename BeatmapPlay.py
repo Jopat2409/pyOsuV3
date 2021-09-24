@@ -141,6 +141,8 @@ class gsBeatmapPlayer:
         self.__init__(self.tempPath, self.parent)
 
     def mButtonUp(self):
+        if not self.isPaused:
+            return
         mX, mY = pygame.mouse.get_pos()
         if mX >= self.buttonBounds[0][0] and mX <= self.buttonBounds[0][2] + self.buttonBounds[0][0]:
 
@@ -207,8 +209,7 @@ class gsBeatmapPlayer:
                 tempSurface.blit(tempFont, (cX-(tempFont.get_width() / 2), cY-(tempFont.get_height()/2)))
             else:
                 break
-        comboText = self.cFont.render("{}x".format(self.combo), True, (255,255,255))
-        tempSurface.blit(comboText, (100,100))
+        self.drawInfoUI(tempSurface)
         if self.isPaused:
             self.drawPauseMenu(tempSurface)
         else:
@@ -216,6 +217,13 @@ class gsBeatmapPlayer:
         
 
         return tempSurface
+    
+    def drawInfoUI(self ,surface):
+        comboText = self.cFont.render("{}x".format(self.combo), True, (255,255,255))
+        comboMargin = int(config.SCREEN_RESOLUTION[0]*(1/20))
+        surface.blit(comboText, (comboMargin, config.SCREEN_RESOLUTION[1] - comboMargin))
+
+
     
     def drawUnstableRateMarker(self, surface):
 
