@@ -68,9 +68,10 @@ def fullParse(beatmapPath):
 
     reading = False
     cSection = ""
+    combo = 0
 
     hitObjects = []
-    combo = 0
+
 
     with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:
 
@@ -88,11 +89,35 @@ def fullParse(beatmapPath):
                 tempObj = [i.strip() for i in line.split(",")]
                 tempHitObject = [int(int(tempObj[0])*config.CURRENT_SCALING), int(int(tempObj[1])*config.CURRENT_SCALING), int(tempObj[2])]
                 #print(tempHitObject)
-                
+                #print(tempObj)
+                osType = "{0:b}".format(int(tempObj[3]))
+                osType = osType[::-1]
+                objectParams = []
+                for i in range(len(osType)):
+                    if osType[i] == "1":
+                        objectParams.append(i)
+                tempHitObject.append(objectParams)
                 tempHitObject.append(combo)
+                if 2 in objectParams:
+                    combo = 1
+                if 1 in objectParams:
+                    # create data
+                    sliderData = []
+                    # split into temp data
+                    tempSliderData = tempObj[5::]
+                    # split the slider into it's type and points
+                    sliderPoints = tempSliderData[0].split("|")
+                    sliderData.append(sliderPoints.pop(0))
+                    points = []
+                    for point in sliderPoints:
+                        pTemp = (point.split(":"))
+                        points.append((int(int(pTemp[0])*config.CURRENT_SCALING), int(int(pTemp[1])*config.CURRENT_SCALING)))
+                    sliderData.append(points)
+                    #print(sliderData)
+                    tempHitObject.append(sliderData)
+                print(tempHitObject)
                 hitObjects.append(tempHitObject)
-                if int(tempObj[3]) == 2:
-                    combo = 0
+
 
     return hitObjects
 
