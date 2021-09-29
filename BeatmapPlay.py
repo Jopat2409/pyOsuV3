@@ -3,13 +3,14 @@ import pygame
 import config
 import pygame.gfxdraw
 import os
+import AiPlayer
 
 
 class gsBeatmapPlayer:
 
 
 
-    def __init__(self, PATH, parentClass):
+    def __init__(self, PATH, parentClass, multi=False):
         self.tempPath = PATH
         # pointer to the parent class
         self.parent = parentClass
@@ -23,6 +24,10 @@ class gsBeatmapPlayer:
         self.pausedTime = 0
         self.offsetTime = 0
         #print(self.hitObjects)
+
+        self.isMulti = multi
+        if self.isMulti:
+            self.AI = AiPlayer.ArtificialIntelligence("mrekk", "Fool")
 
         # calculate all necessary values for the map, such as relative circle size, approach rate in ms etc
         self.getMapValues()
@@ -161,15 +166,25 @@ class gsBeatmapPlayer:
         margin = int(height / 2)
         self.buttonBounds = [(yVal, height+(height+margin)*i, width, height) for i in range(3)]
 
-    def drawFollowPoints(self):
+    def drawFollowPoints(self, surface):
 
         followPointIndex = 0
-        for i in range(self.hitObjects):
+        cTimePos = self.getCurrentPos()
+        for i in range(len(self.hitObjects)):
+            if i == 0:
+                continue
+            pObject = self.hitObjects[i-1]
             cObject = self.hitObjects[i]
-            cPos = (cObject[0], cObject[1])
-            cTime = cObject[2]
-            pPos = (self.hitObjects[i-1][0], self.hitObjects[i-1][1])
-            #pTime = 
+            if cTimePos + self.fadeInStart >= pObject[2]:
+
+                
+                cPos = (cObject[0]+self.xOffset, cObject[1])
+                cTime = cObject[2]
+                pPos = (pObject[0]+self.xOffset, pObject[1])
+                pygame.draw.aaline(surface, (255,255,255), cPos, pPos)
+                #pTime = 
+            else:
+                break
 
             
 
@@ -207,8 +222,23 @@ class gsBeatmapPlayer:
                        pygame.gfxdraw.aacircle(tempSurface, cX, cY, aCircleRadius+i, (255,255,255))
                 tempFont = self.cFont.render(str(hitObject[-1]), True, (255,255,255))
                 tempSurface.blit(tempFont, (cX-(tempFont.get_width() / 2), cY-(tempFont.get_height()/2)))
+                # object is slider
+                if 1 in hitObject[3]:
+                    #print("isslider")
+                    sliderType = hitObject[-1][0]
+                    if sliderType == "L":
+                        pygame.draw.aaline(tempSurface, (255,255,255), (cX, cY), hitObject[-1][1][0])
+                    elif sliderType == "B":
+                        pygame.gfxdraw.bezier(tempSurface, hitObject[-1][1], 2, (255,255,255))
+
+
+
             else:
                 break
+        if self.isMulti:
+            aiPos = self.AI.getCursorPos(self.getCurrentPos())
+            pygame.gfxdraw.filled_circle(tempSurface, aiPos[0]+self.xOffset, aiPos[1], 20, (0,255,0))
+        #self.drawFollowPoints(tempSurface)
         self.drawInfoUI(tempSurface)
         if self.isPaused:
             self.drawPauseMenu(tempSurface)
@@ -311,7 +341,7 @@ class gsBeatmapPlayer:
 
     def update(self):
         try:
-            if int(self.hitObjects[0][2])+self.hitWindows[2] < self.getCurrentPos():
+            if int(self.hitObjects[0][2]) < self.getCurrentPos():
                 self.missNote()
         except IndexError:
             pass
