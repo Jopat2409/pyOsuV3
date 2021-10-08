@@ -66,6 +66,7 @@ def startGame():
     # store the current screen resolution
     config.SCREEN_RESOLUTION = (GetSystemMetrics(0), GetSystemMetrics(1))
     #print("path:" + os.path.dirname(os.path.realpath(__file__)))
+    
     # load all the user's default settings from the osu!.cfg
     # pygame v2 or higher is needed for a lot of the functions within this program
     # no pygame, no run
@@ -78,7 +79,7 @@ def startGame():
         print("You do not have pygame installed. Terminating program...")
         return
     loadSettings()
-    
+    config.xOffset = int((config.SCREEN_RESOLUTION[0] - config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING)/2)
     
     
     
