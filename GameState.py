@@ -11,7 +11,7 @@ import ctypes
 import pickle
 import copy
 import traceback
-
+import logging
 
 
 
@@ -140,12 +140,12 @@ class gameStateManager:
                 # check the current gamestate key table for functions to be called
 
             except KeyError:
-                pass
+                logging.warning(traceback.format_exc())
 
             try:
                 self.cGamestate.KEY_MAP[inputEvent]()
             except KeyError:
-                pass
+                logging.warning(traceback.format_exc())
 
     def checkButtonBounds(self, pos):
         #print("Checking Bounds")
@@ -157,7 +157,7 @@ class gameStateManager:
         try:
             self.cGamestate.buttonNotPressed()
         except AttributeError:
-            pass
+            logging.warning(traceback.format_exc())
             
         
 

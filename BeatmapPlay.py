@@ -3,15 +3,15 @@ import pygame
 import config
 import pygame.gfxdraw
 import os
+import BeatmapFrame
 import AiPlayer
-
-
 
 class gsBeatmapPlayer:
 
 
 
     def __init__(self, PATH, parentClass, multi=False):
+        print("INITIALIZING BEATMAP")
         self.tempPath = PATH
         # pointer to the parent class
         self.parent = parentClass
@@ -106,19 +106,18 @@ class gsBeatmapPlayer:
         """ If the approach rate is less than 5, the formula to work it out is 800+400*(5-approach rate)/5"""
         if float(self.playingBeatmap["ApproachRate"]) < 5:
             self.fadeInTime = int(800 + 400*((5-float(self.playingBeatmap["ApproachRate"])) / 5))
-            self.fadeInStart = int(1200 + 600*((5-float(self.playingBeatmap["ApproachRate"])) / 5))
+            BeatmapFrame.fadeInStart = int(1200 + 600*((5-float(self.playingBeatmap["ApproachRate"])) / 5))
         elif float(self.playingBeatmap["ApproachRate"]) == 5:
             """ If the approach rate is 5, the formula is just 800"""
             self.fadeInTime = 800
-            self.fadeInStart = 1200
+            BeatmapFrame.fadeInStart = 1200
         elif float(self.playingBeatmap["ApproachRate"]) > 5:
             """ If the approach rate is greater than 5, the formula is 800-500*(appraoch rate - 5) / 5"""
             self.fadeInTime = int(800 - 500*((float(self.playingBeatmap["ApproachRate"])-5)/5))
-            self.fadeInStart = int(1200 - 750*((float(self.playingBeatmap["ApproachRate"])-5)/5))
+            BeatmapFrame.fadeInStart = int(1200 - 750*((float(self.playingBeatmap["ApproachRate"])-5)/5))
         # calculate the outer radius of the circle based on the current circle size
-        self.radius = int(config.CURRENT_SCALING*(54.4-4.48*float(self.playingBeatmap["CircleSize"])))
-        self.innerRadius = int(self.radius*0.9)
-        self.hCircleRadius = self.radius*2
+        BeatmapFrame.circleSize = int(config.CURRENT_SCALING*(54.4-4.48*float(self.playingBeatmap["CircleSize"])))
+        BeatmapFrame.approachCircleSize = BeatmapFrame.circleSize*2
 
         # calculate the respective windows for scores, using the map's overall difficulty value
         self.hitWindows = [((400-20*float(self.playingBeatmap["OverallDifficulty"]))/2)*10,
@@ -205,32 +204,8 @@ class gsBeatmapPlayer:
         for hitObject in self.hitObjects:
             combo += 1
             cPos = self.getCurrentPos()
-            if cPos+self.fadeInStart >= hitObject[2]:
-                alpha =  255 / self.fadeInTime * (cPos - (hitObject[2] - self.fadeInStart))
-                if alpha >= 255:
-                    alpha = 255
-
-                aCircleRadius = int(self.radius + self.hCircleRadius * ((hitObject[2]-cPos) / self.fadeInStart))
-                cX = self.xOffset + hitObject[0]
-                cY = hitObject[1]
-
-                
-              
-                pygame.gfxdraw.filled_circle(tempSurface, cX, cY, self.radius, (255,255,255))
-                pygame.gfxdraw.filled_circle(tempSurface, cX, cY, self.innerRadius, (0,0,0))
-                if aCircleRadius > self.radius:
-                   for i in range(0,5):
-                       pygame.gfxdraw.aacircle(tempSurface, cX, cY, aCircleRadius+i, (255,255,255))
-                tempFont = self.cFont.render(str(hitObject[-1]), True, (255,255,255))
-                tempSurface.blit(tempFont, (cX-(tempFont.get_width() / 2), cY-(tempFont.get_height()/2)))
-                # object is slider
-                if 1 in hitObject[3]:
-                    #print("isslider")
-                    sliderType = hitObject[-1][0]
-                    if sliderType == "L":
-                        pygame.draw.aaline(tempSurface, (255,255,255), (cX, cY), hitObject[-1][1][0])
-                    elif sliderType == "B":
-                        pygame.gfxdraw.bezier(tempSurface, hitObject[-1][1], 2, (255,255,255))
+            if cPos+BeatmapFrame.fadeInStart >= hitObject.timingPoint:
+                hitObject.render(cPos, tempSurface)
 
 
 
@@ -238,7 +213,7 @@ class gsBeatmapPlayer:
                 break
         if self.isMulti:
             aiPos = self.AI.getCursorPos(self.getCurrentPos())
-            pygame.gfxdraw.filled_circle(tempSurface, aiPos[0]+self.xOffset, aiPos[1], 20, (0,255,0))
+            pygame.gfxdraw.filled_circle(tempSurface, aiPos[0]+config.xOffset, aiPos[1]+config.yOffset, 20, (0,255,0))
         #self.drawFollowPoints(tempSurface)
         self.drawInfoUI(tempSurface)
         if self.isPaused:
@@ -274,8 +249,8 @@ class gsBeatmapPlayer:
 
         mX, mY = pygame.mouse.get_pos()
 
-        dX = abs(mX - (self.hitObjects[0][0]+self.xOffset))
-        dY = abs(mY - self.hitObjects[0][1])
+        dX = abs(mX - (self.hitObjects[0].x))
+        dY = abs(mY - self.hitObjects[0].y)
         #print("Evaluating mouse press {},{} with circle {},{}".format(mX, mY, self.hitObjects[0][0], self.hitObjects[0][1]))
 
         if dX > self.radius or dY > self.radius:
@@ -319,7 +294,7 @@ class gsBeatmapPlayer:
         #print("Checking Timing Points")
 
         # calculate the difference between the current position and the timing point
-        cDiff = cPos - self.hitObjects[0][2]
+        cDiff = cPos - self.hitObjects[0].timingPoint
         self.hitTimings.append(cDiff)
 
         # if the mouse overlaps with the circle but the timing is within the miss timing point, return 0
@@ -342,7 +317,7 @@ class gsBeatmapPlayer:
 
     def update(self):
         try:
-            if int(self.hitObjects[0][2]) < self.getCurrentPos():
+            if self.hitObjects[0].timingPoint < self.getCurrentPos():
                 self.missNote()
         except IndexError:
             pass

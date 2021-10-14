@@ -1,6 +1,9 @@
+
+
 import re
 
 import config
+import HitObject
 
 
 # only reads the necessary data for viewing the beatmap not playing
@@ -59,7 +62,7 @@ def shallowRead(beatmapPath, basePath):
                     parsed.remove(cSection)
                 except:
                     pass
-            
+
             
 # reads the full file ready to be parsed
 def fullParse(beatmapPath):
@@ -83,38 +86,24 @@ def fullParse(beatmapPath):
                 pass
 
             if cSection == "HitObjects":
-                combo += 1
+                # split the csv
                 tempObj = [i.strip() for i in line.split(",")]
-                tempHitObject = [int(int(tempObj[0])*config.CURRENT_SCALING), int(int(tempObj[1])*config.CURRENT_SCALING), int(tempObj[2])]
-                #print(tempHitObject)
-                #print(tempObj)
+                
                 osType = "{0:b}".format(int(tempObj[3]))
                 osType = osType[::-1]
                 objectParams = []
                 for i in range(len(osType)):
                     if osType[i] == "1":
                         objectParams.append(i)
-                tempHitObject.append(objectParams)
-                tempHitObject.append(combo)
-                if 2 in objectParams:
-                    combo = 1
-                if 1 in objectParams:
-                    # create data
-                    sliderData = []
-                    # split into temp data
-                    tempSliderData = tempObj[5::]
-                    # split the slider into it's type and points
-                    sliderPoints = tempSliderData[0].split("|")
-                    sliderData.append(sliderPoints.pop(0))
-                    points = []
-                    for point in sliderPoints:
-                        pTemp = (point.split(":"))
-                        points.append((int(int(pTemp[0])*config.CURRENT_SCALING), int(int(pTemp[1])*config.CURRENT_SCALING)))
-                    sliderData.append(points)
-                    #print(sliderData)
-                    tempHitObject.append(sliderData)
-                print(tempHitObject)
-                hitObjects.append(tempHitObject)
+                if 0 in objectParams:
+                    # if there is a 0, then the object is a hit circle
+                    hitObjects.append(HitObject.hitCircle(tempObj))
+                elif 1 in objectParams:
+                    hitObjects.append(HitObject.slider(tempObj))
+                elif 3 in objectParams:
+                    hitObjects.append(HitObject.spinner(tempObj))
+                    
+                
 
 
     return hitObjects

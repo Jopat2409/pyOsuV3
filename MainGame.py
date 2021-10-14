@@ -4,7 +4,7 @@ import time
 import sys
 import pygame
 import traceback
-
+import logging
 
 
 # class that controls the whole game
@@ -79,7 +79,7 @@ class osuGame():
                     #print(config.keyBindings[pygame.key.name(event.key).upper()])
                 # if the current gamestate does not have a function for the key pressed, we do nothing
                 except KeyError:
-                    print(traceback.format_exc())
+                    logging.warning(traceback.format_exc())
                 
             elif event.type == pygame.MOUSEBUTTONUP:
                 # try to call the mButtonUp function which is used for things that require mouse dragging etc
@@ -87,20 +87,20 @@ class osuGame():
                     self.gsManager.cGamestate.mButtonUp()
                 except AttributeError:
                     #print(traceback.format_exc())
-                    pass
+                    logging.warning(traceback.format_exc())
                 # try to call the checkButtonBounds function which checks to see if any buttons were pressed
                 try:
                     self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
                 except:
                     #print(traceback.format_exc())
-                    pass
+                    logging.warning(traceback.format_exc())
                 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # try to call the mButtonDow function which is used for objects that require handling of mouse dragging (scrolling etc)
                 try:
                     self.gsManager.cGamestate.mButtonDown()
                 except AttributeError:
-                    pass
+                    logging.warning(traceback.format_exc())
                     #print(traceback.format_exc())
     
         

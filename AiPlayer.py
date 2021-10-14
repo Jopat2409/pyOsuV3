@@ -66,7 +66,7 @@ class ArtificialIntelligence:
 
 
     def generateData(self, beatmap):
-        return "replaydata/VaxeiPoppy.osr"
+        return "replaydata/WhitecatFool.osr"
     
 
 

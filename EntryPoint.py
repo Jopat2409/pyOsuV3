@@ -6,6 +6,8 @@ import os
 import ctypes
 from win32api import GetSystemMetrics
 import glob
+import logging
+import time
 
 
 """
@@ -44,7 +46,7 @@ def loadSettings():
 def getOsuPixelScaling():
 
     # get the scale factor between the current height and the default height (480)
-    cScale = config.SCREEN_RESOLUTION[1] / config.DEFAULT_RESOLUTION[1]
+    cScale = (config.SCREEN_RESOLUTION[1]-100) / config.DEFAULT_RESOLUTION[1]
     # check to make sure that scaling to this height would not cause the beatmap pane to bleed over the edge of the screen
     if (cScale * config.DEFAULT_RESOLUTION[0]) > config.SCREEN_RESOLUTION[0]:
         # update the cScale if that would be a problem
@@ -57,6 +59,9 @@ def getOsuPixelScaling():
 
 def startGame():
 
+    # create the logger that will be used throught the program
+    logging.basicConfig(filename='log.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+
     # prevent the program from scaling due to windows default UI scaling
     ctypes.windll.user32.SetProcessDPIAware()
     # set osu's default resolution
@@ -66,7 +71,6 @@ def startGame():
     # store the current screen resolution
     config.SCREEN_RESOLUTION = (GetSystemMetrics(0), GetSystemMetrics(1))
     #print("path:" + os.path.dirname(os.path.realpath(__file__)))
-    
     # load all the user's default settings from the osu!.cfg
     # pygame v2 or higher is needed for a lot of the functions within this program
     # no pygame, no run
@@ -79,13 +83,15 @@ def startGame():
         print("You do not have pygame installed. Terminating program...")
         return
     loadSettings()
-    config.xOffset = int((config.SCREEN_RESOLUTION[0] - config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING)/2)
+    
     
     
     
     pygame.init()
     # set the mouse cursor to invisible due to the program using it's own cursor
     pygame.mouse.set_visible(False)
+    config.xOffset = int((config.SCREEN_RESOLUTION[0] - config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING)/2)
+    config.yOffset = 50
     #print(config.keyBindings)
     # we import maingame here as many for the links to assets will not work without being initialized first
     import MainGame

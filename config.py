@@ -38,7 +38,7 @@ idGen = idGenerator()
 
 """ COLORS """
 
-
+bmFrame = {"ComboColor":(255,255,255)}
 
 WHITE = (255,255,255)
 PINK  = (255,102,170)
