@@ -3,7 +3,7 @@ import os
 import glob
 import osrparse
 import hashlib
-
+import checksumdir
 
 
 def md5Checksum(fname):
@@ -13,6 +13,15 @@ def md5Checksum(fname):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
+
+class BeatmapHash:
+
+
+    def __init__(self):
+
+        self.beatmapHashMap = {}
+        self.includedBeatmaps = []
+        self.lastChecksumLocal = ""
 
 class NeuralNetworkPlayer:
 
@@ -31,19 +40,52 @@ class NeuralNetworkPlayer:
         
         if not os.path.isfile(".temp/beatmaphash.dat"):
             self.createBeatmapHash()
-
+        else:
+            self.updateBeatmapHash()
         
         self.playerProfile = playerProfile
     
     
     def createBeatmapHash(self):
-        replayHashFiles = {}
+        self.beatmapHash = BeatmapHash()
+        basePath = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        for beatmap in os.listdir(os.path.join(basePath, "beatmaps")):
+            for tempBeatmap in glob.glob(os.path.join(basePath, "beatmaps", beatmap, "*.osu")):
+                self.beatmapHash.beatmapHashMap.update({md5Checksum(tempBeatmap):tempBeatmap})
+            self.beatmapHash.includedBeatmaps.append(checksumdir.dirhash(os.path.join(basePath, "beatmaps", beatmap)))
 
-        for beatmap in glob.glob("\\beatmaps"):
-            for difficulty in glob.glob(os.path.join("\\beatmaps", beatmap, "*.osu")):
-                print(difficulty)
+        self.beatmapHash.lastChecksumLocal = checksumdir.dirhash(os.path.join(basePath, "beatmaps"))
 
+        with open(".temp/beatmaphash.dat", 'wb') as tempFile:
+            pickle.dump(self.beatmapHash, tempFile)
 
+        
+    def updateBeatmapHash(self):
+        tempBeatmapHash = None
+        basePath = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        with open(".temp/beatmaphash.dat", 'rb') as tempFile:
+            tempBeatmapHash = pickle.load(tempFile)
+        
+        if tempBeatmapHash.lastChecksumLocal == checksumdir.dirhash(os.path.join(basePath, "beatmaps")):
+            print("The Same")
+            self.beatmapHash = tempBeatmapHash
+        else:
+            total = 0
+            tempBeatmapHash.lastChecksumLocal = checksumdir.dirhash(os.path.join(basePath, "beatmaps"))
+            for beatmap in os.listdir(os.path.join(basePath, "beatmaps")):
+                if checksumdir.dirhash(os.path.join(basePath, "beatmaps", beatmap)) in tempBeatmapHash.includedBeatmaps:
+                    continue
+                else:
+                    total += 1
+                    for tempBeatmap in glob.glob(os.path.join(basePath, "beatmaps", beatmap, "*.osu")):
+                        tempBeatmapHash.beatmapHashMap.update({md5Checksum(tempBeatmap):tempBeatmap})
+                    tempBeatmapHash.includedBeatmaps.append(checksumdir.dirhash(os.path.join(basePath, "beatmaps", beatmap)))
+        
+            self.beatmapHash = tempBeatmapHash
+            with open(".temp/beatmaphash.dat", 'wb') as tempFile:
+                pickle.dump(self.beatmapHash, tempFile)
+            print("Parsed {} new beatmaps".format(total))
+        
 
 
     def mapReplayFiles(self, replayFolder):
@@ -57,4 +99,8 @@ class NeuralNetworkPlayer:
 
         mappedReplays = self.mapReplayFiles(replayFolder)
 
-            
+
+
+if __name__ == "__main__":
+    print("RUNNING")
+    testNetwork = NeuralNetworkPlayer()
