@@ -48,7 +48,9 @@ class slider:
             nextPoints = tempSliderData[1::]
             for i in nextPoints:
                 tempPoint = i.split(":")
-                self.points.append((int(tempPoint[0]), int(tempPoint[1])))
+                tempX = int(int(tempPoint[0]) * config.CURRENT_SCALING) + config.xOffset
+                tempY = int(int(tempPoint[1]) * config.CURRENT_SCALING) + config.yOffset
+                self.points.append((tempX, tempY))
             
 
     def render(self, cPos, surface):
