@@ -13,6 +13,16 @@ def md5Checksum(fname):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
+def interpolate(pos1, pos2, cTime):
+
+    prevPos = (pos1.x, pos1.y)
+    cPos = (pos2.x, pos2.y)
+
+    timeIn = cTime - pos1.time_delta
+    overallTime = pos2.time_delta - pos1.time_delta
+    xDiff = cPos[0] - prevPos[0]
+    yDiff = cPos[1] - prevPos[1]
+    return (int(prevPos[0] + (timeIn/overallTime)*xDiff), int(prevPos[1] + (timeIn/overallTime)*yDiff))
 
 class BeatmapHash:
 
@@ -44,6 +54,10 @@ class NeuralNetworkPlayer:
             self.updateBeatmapHash()
         
         self.playerProfile = playerProfile
+
+
+        """ ------------------- NEURAL NETWORK TRAINING PARAMETERS -----------------------"""
+        self.FPS = 25       # a screenshot of the replay data is taken every 40 ms
     
     
     def createBeatmapHash(self):
@@ -90,17 +104,63 @@ class NeuralNetworkPlayer:
 
     def mapReplayFiles(self, replayFolder):
 
+        replayMap = {}
+
         for replay in glob.glob(os.path.join(replayFolder, "*.osr")):
             parsedReplay = osrparse.parse_replay_file(os.path.join(replayFolder, replay))
             mapHash = parsedReplay.beatmap_hash
-
+            replayMap.update({parsedReplay:self.beatmapHash.beatmapHashMap[mapHash]})
+        return replayMap
 
     def trainNetwork(self, replayFolder):
 
         mappedReplays = self.mapReplayFiles(replayFolder)
+        
+        trainingData = self.getIOData(mappedReplays)
+
+    def parseTimeDelta(self, replayData):
+        cTimeDelta = 0
+        for i in replayData:
+            tempTimeDelta = i.time_delta
+            i.time_delta += cTimeDelta
+            cTimeDelta += tempTimeDelta
+        return replayData
+
+    def replayParse(self, replay):
+
+        replayData = replay.play_data
+        replayData = self.parseTimeDelta(replayData)
+        cTime = 0
+        timeSkip = 1000/self.FPS
+
+        OUTPUT_DATA = []
+        isReading = True
+        toPass = 0
+        while(isReading):
+            for replayEvent in range(len(replayData)):
+                #print(replayData[replayEvent].time_delta)
+                if replayData[replayEvent].time_delta > cTime:
+                    #print("PARSING")
+                    toPass = replayEvent
+                    OUTPUT_DATA.append(interpolate(replayData[replayEvent-1], replayData[replayEvent], cTime))
+
+                    break
+            cTime += timeSkip
+            replayData = replayData[toPass::]
+            if len(replayData) == 0:
+                isReading = False
+        return OUTPUT_DATA
+                
+
+    def getIOData(self, replayMap):
+
+        for replay in replayMap:
+            OUTPUT_DATA = self.replayParse(replay)
+            INPUT_DATA = self.beatmapParse(replayMap[replay])
 
 
 
 if __name__ == "__main__":
     print("RUNNING")
     testNetwork = NeuralNetworkPlayer()
+    testNetwork.trainNetwork("C:\\Users\\Joe\\Documents\\GitHub\\pyOsuV3\\replaydata")
