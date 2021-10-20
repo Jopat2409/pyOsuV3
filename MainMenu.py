@@ -4,6 +4,7 @@ import pygame.gfxdraw
 import config
 import math
 import sys
+import AiGamestate
 
 import BeatmapSelect
 
@@ -28,7 +29,7 @@ class MainButton:
         # the three buttons that can be selected
         self.buttons = ["Play", "AI", "Exit"]
         # the functions that correspond to them
-        self.functions = [self.optionPlay, self.defunctFunct, self.exit]
+        self.functions = [self.optionPlay, self.optionAI, self.exit]
 
         # get instance of parent class
         self.parentClass = parent
@@ -41,6 +42,10 @@ class MainButton:
         #print("Playing")
         # switch to the next gamestate
         self.parentClass.newGamestate(BeatmapSelect.gsBeatmapSelect(self.parentClass))
+
+    def optionAI(self):
+
+        self.parentClass.newGamestate(AiGamestate.gsNeuralNetworkTrain(self.parentClass))
 
     def defunctFunct(self):
         pass
