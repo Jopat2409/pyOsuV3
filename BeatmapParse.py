@@ -110,5 +110,49 @@ def fullParse(beatmapPath):
 
             
 
+def aiParse(beatmapPath):
+
+    reading = False
+    cSection = ""
+    combo = 0
+
+    hitObjects = []
+    osWidth, osHeight = (640, 480)
+
+
+    with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:
+
+        for line in cBeatmap:
+            tempSearch = re.search(r"\[([A-Za-z0-9_]+)\]", line)
+
+            try:
+                cSection = tempSearch.group(1)
+                continue
+            except:
+                pass
+
+            if cSection == "HitObjects":
+                # split the csv
+                tempObj = [i.strip() for i in line.split(",")]
+                
+                osType = "{0:b}".format(int(tempObj[3]))
+                osType = osType[::-1]
+                objectParams = []
+                for i in range(len(osType)):
+                    if osType[i] == "1":
+                        objectParams.append(i)
+                tempObj = [int(i) for i in tempObj[0:3]]
+                if 1 in objectParams:
+                    tempObj.append(1)
+                else:
+                    tempObj.append(0)
+                
+                if 3 in objectParams:
+                    tempObj.append(1)
+                else:
+                    tempObj.append(0)
+                hitObjects.append(tempObj)
+    
+    return hitObjects
         
     

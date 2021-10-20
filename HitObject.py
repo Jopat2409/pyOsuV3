@@ -81,3 +81,6 @@ class spinner:
         pygame.gfxdraw.filled_circle(surface, self.x, self.y, int(BeatmapFrame.circleSize/5), BeatmapFrame.currentComboColor)
         pygame.gfxdraw.aacircle(surface, self.x, self.y, BeatmapFrame.circleSize*5, BeatmapFrame.currentComboColor)
         
+
+
+
