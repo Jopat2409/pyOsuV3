@@ -4,12 +4,11 @@ import config
 
 
 
-
 class pickButtonClass:
 
 
-    def __init__(self):
-
+    def __init__(self, parent):
+        self.parent = parent
         self.bWidth = int(config.SCREEN_RESOLUTION[0] / 2)
         self.bHeight = int(config.SCREEN_RESOLUTION[1] / 9)
 
@@ -20,6 +19,7 @@ class pickButtonClass:
         self.font = pygame.font.SysFont('Arial', 25)
 
         self.buttonBounds = [(self.bX, self.bY+self.bHeight*i*2, self.bWidth, self.bHeight) for i in range(2)]
+        self.buttonFunc = [self.play, self.train]
         print(self.buttonBounds)
 
     def render(self, surface):
@@ -29,8 +29,6 @@ class pickButtonClass:
             pygame.draw.rect(surface, config.PINK, self.buttonBounds[b])
             surface.blit(self.font.render(self.buttonText[b], True, (0,0,0)), (self.buttonBounds[b][0], self.buttonBounds[b][1]))
 
-        
-
 
 class gsNeuralNetworkTrain:
 
@@ -39,8 +37,17 @@ class gsNeuralNetworkTrain:
 
         self.parentClass = parentClass
 
-        self.cButtonWrapper = pickButtonClass()
+        self.cButtonWrapper = pickButtonClass(self)
 
+    def mButtonUp(self):
+
+        mX, mY = pygame.mouse.get_pos()
+        for i in self.cButtonWrapper.buttonBounds:
+            button = self.cButtonWrapper.buttonBounds[i]
+            if mX >= button[0] and mX <= button[2]:
+                if mY >= button[1] and mY < button[3]:
+                    self.cButtonWrapper.buttonFunct[i]()
+                    break
 
 
     def getRenderSnapshot(self, interpolation):
