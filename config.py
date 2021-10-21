@@ -1,6 +1,9 @@
 
 
 DEFAULT_PATH = ""
+CURRENT_SCALING = 1
+xOffset = 0
+yOffset = 0
 keyBindings = {}
 currentSettings = {}
 

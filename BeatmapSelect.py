@@ -11,7 +11,7 @@ import pygame
 import math
 import time
 import sys
-
+import checksumdir
 
 
 
@@ -35,7 +35,7 @@ class gsBeatmapSelect:
 
 
         
-        cPath = bgPath = config.DEFAULT_PATH + '/temp/beatmapSelect.obj'
+        cPath = bgPath = config.DEFAULT_PATH + '\\.temp\\beatmapSelect.dat'
         bgPath = config.DEFAULT_PATH + '/assets/bg/online_background_68261587a4e3fbe77cad07120ee1e864.jpg'
         bg = pygame.image.load(bgPath)
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
@@ -67,15 +67,33 @@ class gsBeatmapSelect:
 
         bmLoadStart = time.time()
 
+        # checks to see if a beatmap cache already exists
         if os.path.isfile(cPath):
-            with open(cPath, 'r') as file:
-                self.beatmaps = pickle.load(file)
+            
+            # if it does, load the objects stored in at directory cPath as self.beatmaps
+            data = None
+            with open(cPath, 'rb') as file:
+                print("Loaded pre-loaded beatmaps")
+                data = pickle.load(file)
+            self.beatmaps = data[0]
         else:
+            # if it does not exist
+            count = 0
+            bmParsed = []
+            # loop through all beatmap directories
             for beatmap in os.listdir("%s/beatmaps/"%config.DEFAULT_PATH):
                 PATH = "%s\\beatmaps\\%s"%(config.DEFAULT_PATH, beatmap)
+                bmParsed.append(checksumdir.dirhash(PATH))
+                # loop through all .osu files in beatmap directory
                 for diff in glob.glob(PATH + "/" + "*.osu"):
-                    
+                    # parse .osu file and append it to list of beatmaps
                     self.beatmaps.append(BeatmapParse.shallowRead(diff,PATH))
+                    count += 1
+            print(f"Loaded {count} new beatmaps!")
+            # writes it to cPath when all beatmaps are parsed
+            with open(cPath, 'wb') as beatmapFile:
+                tempData = (self.beatmaps, bmParsed, checksumdir.dirhash("%s/beatmaps/"%config.DEFAULT_PATH))
+                pickle.dump(tempData, beatmapFile)
         self.calculateBmBounds()
         print("It took {}s to load all beatmaps".format(time.time()-bmLoadStart))
         #print(self.beatmaps)
