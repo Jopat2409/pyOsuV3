@@ -197,8 +197,11 @@ class gsBeatmapPlayer:
 
     def getRenderSnapshot(self, interpolation):
 
+        
         tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
+        #tempSurface.fill((0,0,0))
         tempSurface.blit(self.bgIMG, (0,0))
+        
         #tempSurface.fill((0,0,0))
         
 

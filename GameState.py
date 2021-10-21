@@ -123,7 +123,7 @@ class gameStateManager:
         else:
             color = (255,0,0)
         fps = self.font.render("{}".format(frames), True, color)
-        self.window.blit(fps, (500,1000))
+        self.window.blit(fps, (config.SCREEN_RESOLUTION[0]-fps.get_width(),config.SCREEN_RESOLUTION[1]-fps.get_height()))
         # update the display
         pygame.display.update()
 
