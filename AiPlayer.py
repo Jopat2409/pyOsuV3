@@ -1,7 +1,7 @@
 from time import time
 import osrparse
 import config
-
+import time
 
 
 class ArtificialIntelligence:
@@ -9,7 +9,7 @@ class ArtificialIntelligence:
 
     def __init__(self, network, beatmapFile):
 
-
+        self.isReady = False
         self.createReplay(beatmapFile)
     
 
@@ -19,16 +19,19 @@ class ArtificialIntelligence:
         self.replay = osrparse.parse_replay_file(tempReplay)
         self.mouseData = self.replay.play_data
         self.getMouseEvents()
+        self.isReady = True
 
 
     def getCursorPos(self, timePos):
-        if self.mouseData[0].time_delta == timePos:
-            return (int(self.mouseData[0].x), int(self.mouseData[0].y))
-        elif self.mouseData[1].time_delta == timePos:
-            self.mouseData.pop(0)
-            return (int(self.mouseData[1].x), int(self.mouseData[1].y))
+
         
-        return self.interpolatePosition(timePos)
+
+        for i in range(len(self.mouseData)):
+            mousePos = self.mouseData[i]
+            if mousePos.time_delta == timePos:
+                return [mousePos.x, mousePos.y]
+            elif mousePos.time_delta > timePos:
+                return self.interpolatePosition(i-1, i, timePos)
 
     def getMouseEvents(self):
         timePos = 0
@@ -36,32 +39,32 @@ class ArtificialIntelligence:
             tempTime = i.time_delta
             i.time_delta += timePos
             timePos += tempTime
-            i.x = i.x*config.CURRENT_SCALING
-            i.y = i.y*config.CURRENT_SCALING
+            i.x = int(i.x*config.CURRENT_SCALING) + config.xOffset
+            i.y = int(i.y*config.CURRENT_SCALING) + config.yOffset
     
-    def interpolatePosition(self, timePosition):
+    def interpolatePosition(self, firstIndex, secondIndex, timePos, verbose=False):
 
-        cEvent = self.mouseData[1]
-        pEvent = self.mouseData[0]
+        
 
-        if timePosition > cEvent.time_delta:
-            self.mouseData.pop(0)
-            cEvent = self.mouseData[1]
-            pEvent = self.mouseData[0]
+        pMData = self.mouseData[firstIndex]
+        cMData = self.mouseData[secondIndex]
+        
 
-        if timePosition > pEvent.time_delta and timePosition < cEvent.time_delta:
-            #print("interpolated")
-            timeDiff = cEvent.time_delta - pEvent.time_delta
-            timeRatio = (timePosition - pEvent.time_delta) / timeDiff
-            diffX = cEvent.x - pEvent.x
-            diffY = cEvent.y - pEvent.y
+        timeRatio = (timePos-pMData.time_delta) / (cMData.time_delta-pMData.time_delta)
+        if verbose:
+            print(f"{timeRatio*100}% of the way through")
+            print(f"{pMData.time_delta} < {timePos} < {cMData.time_delta}")
+        
 
-            tempPos = (int(pEvent.x + diffX*timeRatio), int(pEvent.y + diffY*timeRatio))
+        xDiff = int(pMData.x + (cMData.x - pMData.x)*timeRatio)
+        yDiff = int(pMData.y + (cMData.y - pMData.y)*timeRatio)
+        if verbose:
+            print(f"{pMData.x} ---- {xDiff} ---- {cMData.x}")
+            print(f"{pMData.y} ---- {xDiff} ---- {cMData.y}\n")
+        self.mouseData = self.mouseData[firstIndex::]
+        
 
-            return tempPos
-        #print("ERROR: {} is not in between {} and {}".format(timePosition, pEvent.time_delta, cEvent.time_delta))
-        return (int(self.mouseData[0].x), int(self.mouseData[0].y))
-
+        return (xDiff, yDiff)
 
 
 
@@ -74,3 +77,7 @@ class ArtificialIntelligence:
 if __name__ == "__main__":
 
     ai = ArtificialIntelligence("mrekk", "beatmap")
+
+    for i in range(0, 10000):
+        ai.getCursorPos(i)
+
