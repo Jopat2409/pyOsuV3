@@ -27,8 +27,7 @@ class gsBeatmapPlayer:
         #print(self.hitObjects)
 
         self.isMulti = multi
-        if self.isMulti:
-            self.AI = AiPlayer.ArtificialIntelligence("mrekk", "Fool")
+        
 
         # calculate all necessary values for the map, such as relative circle size, approach rate in ms etc
         self.getMapValues()
@@ -62,6 +61,11 @@ class gsBeatmapPlayer:
 
         self.isPaused = False
 
+        if self.isMulti:
+            self.AI = AiPlayer.ArtificialIntelligence("mrekk", "Fool")
+            while not self.AI.isReady:
+                continue
+        
         # plays the song and begins the beatmap
         self.soundHandler.playSong(self.playingBeatmap["BasePath"]+"/"+self.playingBeatmap["AudioFilename"])
 
@@ -195,7 +199,7 @@ class gsBeatmapPlayer:
 
         tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
         tempSurface.blit(self.bgIMG, (0,0))
-        tempSurface.fill((0,0,0))
+        #tempSurface.fill((0,0,0))
         
 
         
@@ -213,7 +217,8 @@ class gsBeatmapPlayer:
                 break
         if self.isMulti:
             aiPos = self.AI.getCursorPos(self.getCurrentPos())
-            pygame.gfxdraw.filled_circle(tempSurface, aiPos[0]+config.xOffset, aiPos[1]+config.yOffset, 20, (0,255,0))
+            #print(self.getCurrentPos())
+            pygame.gfxdraw.filled_circle(tempSurface, aiPos[0], aiPos[1], 20, (0,255,0))
         #self.drawFollowPoints(tempSurface)
         self.drawInfoUI(tempSurface)
         if self.isPaused:
