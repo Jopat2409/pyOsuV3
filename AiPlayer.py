@@ -22,25 +22,32 @@ class ArtificialIntelligence:
         self.isReady = True
 
 
-    def getCursorPos(self, timePos):
+    def getCursorPos(self, timePos, verbose=False):
 
-        
+        if verbose:
+                print(f"Current time is {timePos}, first mouse data time is {self.mouseData[0]}")
 
         for i in range(len(self.mouseData)):
             mousePos = self.mouseData[i]
+            
             if mousePos.time_delta == timePos:
                 return [mousePos.x, mousePos.y]
             elif mousePos.time_delta > timePos:
-                return self.interpolatePosition(i-1, i, timePos)
+                return self.interpolatePosition(i-1, i, timePos, verbose)
 
     def getMouseEvents(self):
         timePos = 0
+        timeDeltaString = ""
         for i in self.mouseData:
             tempTime = i.time_delta
             i.time_delta += timePos
             timePos += tempTime
             i.x = int(i.x*config.CURRENT_SCALING) + config.xOffset
             i.y = int(i.y*config.CURRENT_SCALING) + config.yOffset
+
+            timeDeltaString += str(i.time_delta) + " "
+        print(timeDeltaString)
+        
     
     def interpolatePosition(self, firstIndex, secondIndex, timePos, verbose=False):
 
@@ -49,11 +56,14 @@ class ArtificialIntelligence:
         pMData = self.mouseData[firstIndex]
         cMData = self.mouseData[secondIndex]
         
-
+        if verbose:
+            print(f"{firstIndex} - {secondIndex}")
+            print(f"{pMData.time_delta} < {timePos} < {cMData.time_delta}")
+        
         timeRatio = (timePos-pMData.time_delta) / (cMData.time_delta-pMData.time_delta)
         if verbose:
             print(f"{timeRatio*100}% of the way through")
-            print(f"{pMData.time_delta} < {timePos} < {cMData.time_delta}")
+            
         
 
         xDiff = int(pMData.x + (cMData.x - pMData.x)*timeRatio)
@@ -61,7 +71,6 @@ class ArtificialIntelligence:
         if verbose:
             print(f"{pMData.x} ---- {xDiff} ---- {cMData.x}")
             print(f"{pMData.y} ---- {xDiff} ---- {cMData.y}\n")
-        self.mouseData = self.mouseData[firstIndex::]
         
 
         return (xDiff, yDiff)
@@ -69,7 +78,7 @@ class ArtificialIntelligence:
 
 
     def generateData(self, beatmap):
-        return "replaydata/WhitecatFool.osr"
+        return "replaydata/VaxeiPoppy.osr"
     
 
 
