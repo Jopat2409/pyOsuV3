@@ -102,7 +102,12 @@ class gsMenu:
 
         # scale the image to the size of the screen
         bg = pygame.image.load(bgPath)
-        self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
+        self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION).convert()
+
+        self.mainWindow = pygame.Surface(config.SCREEN_RESOLUTION).convert()
+        self.uiRect = pygame.Surface((config.SCREEN_RESOLUTION[0], int(config.SCREEN_RESOLUTION[1]/8))).convert_alpha()
+        self.uiRect.set_alpha(150)
+        self.uiRect.fill((0,0,0))
 
         self.parent = parent
 
@@ -127,7 +132,7 @@ class gsMenu:
     def getRenderSnapshot(self, interpolation):
 
         # create the surface that will be blitted to the main window
-        tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
+        tempSurface = self.mainWindow
         # add the background image
         tempSurface.blit(self.bgIMG, (0,0))
         if config.safeMode:
@@ -136,6 +141,8 @@ class gsMenu:
         # render all of the objects
         for _object in self.buttons:
             _object.render(tempSurface)
+        
+        tempSurface.blit(self.uiRect, (0,0))
             
 
         #tempSurface.fill((200,0,200))

@@ -88,6 +88,7 @@ def startGame():
     
     
     pygame.init()
+    pygame.mixer.pre_init(44100, 16, 2, 4096)
     # set the mouse cursor to invisible due to the program using it's own cursor
     pygame.mouse.set_visible(False)
     config.xOffset = int((config.SCREEN_RESOLUTION[0] - config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING)/2)

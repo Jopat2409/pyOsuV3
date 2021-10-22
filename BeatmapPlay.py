@@ -20,6 +20,7 @@ class gsBeatmapPlayer:
         #print(PATH)
         # load the data from the beatmap file which will be used to display and run the map
         self.playingBeatmap = PATH
+        
         self.hitObjects = BeatmapParse.fullParse(self.playingBeatmap["osuPath"])
 
         self.pausedTime = 0
@@ -35,7 +36,7 @@ class gsBeatmapPlayer:
         # load and display the background image assigned to the map
         PATH = os.path.join(self.playingBeatmap["BasePath"],self.playingBeatmap["BackgroundImage"])
         PATH = PATH.replace("\\","/")
-        bg = pygame.image.load(PATH.strip())
+        bg = pygame.image.load(PATH.strip()).convert()
         # transform the image to the size of the screen currently
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
 
@@ -60,6 +61,8 @@ class gsBeatmapPlayer:
         self.hitTimings = []
 
         self.isPaused = False
+
+        self.mainSurface = pygame.Surface(config.SCREEN_RESOLUTION).convert()
 
         if self.isMulti:
             self.AI = AiPlayer.ArtificialIntelligence("mrekk", "Fool")
@@ -88,7 +91,7 @@ class gsBeatmapPlayer:
         self.hitObjects.pop(0)
 
     def getCurrentPos(self):
-        return self.soundHandler.musicChannel.get_pos() + self.offsetTime        
+        return self.soundHandler.musicChannel.get_pos() + self.offsetTime
 
     def pauseMap(self):
         cPos = self.getCurrentPos()
@@ -198,9 +201,12 @@ class gsBeatmapPlayer:
     def getRenderSnapshot(self, interpolation):
 
         
-        tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
-        #tempSurface.fill((0,0,0))
+
+        tempSurface = self.mainSurface
+        tempSurface.fill((0,0,0))
         tempSurface.blit(self.bgIMG, (0,0))
+        #tempSurface.fill((0,0,0))
+        
         
         #tempSurface.fill((0,0,0))
         
@@ -208,9 +214,10 @@ class gsBeatmapPlayer:
         
 
         combo = 0
+        cPos = self.getCurrentPos()
         for hitObject in self.hitObjects:
             combo += 1
-            cPos = self.getCurrentPos()
+            
             if cPos+BeatmapFrame.fadeInStart >= hitObject.timingPoint:
                 hitObject.render(cPos, tempSurface)
 
@@ -219,7 +226,7 @@ class gsBeatmapPlayer:
             else:
                 break
         if self.isMulti:
-            aiPos = self.AI.getCursorPos(self.getCurrentPos())
+            aiPos = self.AI.getCursorPos(cPos)
             #print(self.getCurrentPos())
             pygame.gfxdraw.filled_circle(tempSurface, aiPos[0], aiPos[1], 20, (0,255,0))
         #self.drawFollowPoints(tempSurface)

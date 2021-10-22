@@ -22,8 +22,6 @@ class gameStateManager:
     def __init__(self):
 
 
-        # sets the initial gamestate to the main menu
-        self.cGamestate = MainMenu.gsMenu(self)
         # creates the stack used for storing paused gamestates
         self.gsStack = queue.LifoQueue()
         # prevents the program from displaying the wrong res due to windows UI scaling
@@ -44,10 +42,16 @@ class gameStateManager:
 
         # uses fullscreen width if in fullscreen        
         if int(config.currentSettings["Fullscreen"]) == 1:
-            self.window = pygame.display.set_mode((int(config.currentSettings["WidthFullscreen"]), int(config.currentSettings["HeightFullscreen"])))
+            flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
+            self.window = pygame.display.set_mode((int(config.currentSettings["WidthFullscreen"]), int(config.currentSettings["HeightFullscreen"])), flags)
             pygame.display.toggle_fullscreen()
         else:
-            self.window = pygame.display.set_mode(config.SCREEN_RESOLUTION)
+            self.window = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE )
+        
+        self.window.convert()
+
+        # sets the initial gamestate to the main menu
+        self.cGamestate = MainMenu.gsMenu(self)
 
 
     """hashes all relevant info about a gamestate, should be used when the time between resuming the gamestate is relatively large, or if the new gamestate

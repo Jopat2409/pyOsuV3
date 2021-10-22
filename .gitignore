@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 log.log
 .temp/beatmapSelect.dat
+*.log
