@@ -1,0 +1,26 @@
+"filename", "language", "Python", "Markdown", "Properties", "Ini", "comment", "blank", "total"
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\.github\ISSUE_TEMPLATE\bug_report.md", "Markdown", 0, 30, 0, 0, 0, 9, 39
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\.github\ISSUE_TEMPLATE\feature_request.md", "Markdown", 0, 15, 0, 0, 0, 6, 21
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\AiGamestate.py", "Python", 38, 0, 0, 0, 0, 30, 68
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\AiPlayer.py", "Python", 55, 0, 0, 0, 0, 38, 93
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\BeatmapFrame.py", "Python", 3, 0, 0, 0, 1, 3, 7
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\BeatmapParse.py", "Python", 100, 0, 0, 0, 21, 38, 159
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\BeatmapPlay.py", "Python", 195, 0, 0, 0, 48, 103, 346
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\BeatmapSelect.py", "Python", 161, 0, 0, 0, 23, 88, 272
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\CONTRIBUTING.md", "Markdown", 0, 1, 0, 0, 0, 1, 2
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\EntryPoint.py", "Python", 53, 0, 0, 0, 34, 24, 111
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\FileHandle.py", "Python", 0, 0, 0, 0, 0, 5, 5
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", "Python", 106, 0, 0, 0, 39, 59, 204
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\HitObject.py", "Python", 52, 0, 0, 0, 1, 34, 87
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\MainAi.py", "Python", 178, 0, 0, 0, 5, 64, 247
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", "Python", 76, 0, 0, 0, 24, 25, 125
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\MainMenu.py", "Python", 78, 0, 0, 0, 26, 58, 162
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\README.md", "Markdown", 0, 1, 0, 0, 0, 0, 1
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\SkinLoader.py", "Python", 25, 0, 0, 0, 2, 8, 35
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\SoundHandler.py", "Python", 26, 0, 0, 0, 8, 33, 67
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\UiElements.py", "Python", 52, 0, 0, 0, 3, 47, 102
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\UiManager.py", "Python", 60, 0, 0, 0, 11, 39, 110
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\config.py", "Python", 26, 0, 0, 0, 2, 21, 49
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\osu!.cfg", "Properties", 0, 0, 221, 0, 4, 3, 228
+"c:\Users\Joe\Documents\GitHub\pyOsuV3\skins\-        # re;owoTuna v1.1 『Selyu』 #        -\skin.ini", "Ini", 0, 0, 0, 47, 0, 9, 56
+"Total", "-", 1284, 47, 221, 47, 252, 745, 2596

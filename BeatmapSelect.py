@@ -12,7 +12,7 @@ import math
 import time
 import sys
 import checksumdir
-
+import SkinLoader
 
 
 class gsBeatmapSelect:
@@ -40,6 +40,7 @@ class gsBeatmapSelect:
         bg = pygame.image.load(bgPath)
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
 
+
         self.beatmapBounds = []
 
         # hard coded number representing how many beatmaps are shown on screen at once
@@ -64,6 +65,8 @@ class gsBeatmapSelect:
 
 
         self.font = pygame.font.SysFont('Arial', 25)
+
+        SkinLoader.loadBeatmapSelectImages()
 
         bmLoadStart = time.time()
 
@@ -244,9 +247,8 @@ class gsBeatmapSelect:
 
         
 
-    def getRenderSnapshot(self, interpolation):
+    def getRenderSnapshot(self, interpolation, tempSurface):
 
-        tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
         tempSurface.blit(self.bgIMG, (0,0))
         if config.safeMode:
             tempSurface.fill((150,150,150))
@@ -259,6 +261,8 @@ class gsBeatmapSelect:
         self.drawBeatmapRects(beatmapFrame)
 
         tempSurface.blit(beatmapFrame, ((config.SCREEN_RESOLUTION[0] / 3)*2,0))
+
+        tempSurface.blit(SkinLoader.stateMap["selectOverlay"], (0,0))
 
         return tempSurface
                 

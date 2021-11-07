@@ -12,15 +12,14 @@ import pickle
 import copy
 import traceback
 import logging
-
+import SkinLoader
 
 
 # manages the current gamestate of the game
 class gameStateManager:
 
 
-    def __init__(self):
-
+    def __init__(self,):
 
         # creates the stack used for storing paused gamestates
         self.gsStack = queue.LifoQueue()
@@ -40,19 +39,23 @@ class gameStateManager:
 
         self.font = pygame.cFont = pygame.font.SysFont('Arial', 40)
 
+        self.cursorSize = int(100 * float(config.currentSettings["CursorSize"]))
+
         # uses fullscreen width if in fullscreen        
         if int(config.currentSettings["Fullscreen"]) == 1:
-            flags = pygame.FULLSCREEN | pygame.DOUBLEBUF
-            self.window = pygame.display.set_mode((int(config.currentSettings["WidthFullscreen"]), int(config.currentSettings["HeightFullscreen"])), flags)
+            flags = pygame.FULLSCREEN | pygame.DOUBLEBUF 
+            self.window = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.SRCALPHA, 32 )
             pygame.display.toggle_fullscreen()
         else:
-            self.window = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE )
+            self.window = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.SRCALPHA, 32 )
         
-        self.window.convert()
+        
 
         # sets the initial gamestate to the main menu
         self.cGamestate = MainMenu.gsMenu(self)
 
+    def setUiManager(self, uiManager):
+        self.uiManager = uiManager
 
     """hashes all relevant info about a gamestate, should be used when the time between resuming the gamestate is relatively large, or if the new gamestate
     requires a larger amount of processing power / memory
@@ -114,20 +117,25 @@ class gameStateManager:
     def render(self, interpolation, frames):
 
         # blit the frame returned by the current gamestate's render method onto the main window
-        self.window.blit(self.cGamestate.getRenderSnapshot(interpolation), (0,0))
+        self.cGamestate.getRenderSnapshot(interpolation, self.window)
         # draw the chat popup if it is enabled
         if self.chatToggle:
             pygame.draw.rect(self.window,(0,0,0),(200,150,100,50))
             
-        # render the cursor at the current mouse position
-        mX, mY = pygame.mouse.get_pos()
-        pygame.gfxdraw.filled_circle(self.window, mX, mY, 20, (255,255,0))
+        
         if frames >= 60:
             color = (0,255,0)
         else:
             color = (255,0,0)
+        self.uiManager.render(self.window)
         fps = self.font.render("{}".format(frames), True, color)
         self.window.blit(fps, (config.SCREEN_RESOLUTION[0]-fps.get_width(),config.SCREEN_RESOLUTION[1]-fps.get_height()))
+
+        # render the cursor at the current mouse position
+        mX, mY = pygame.mouse.get_pos()
+        mX -= self.cursorSize / 2
+        mY -= self.cursorSize / 2
+        self.window.blit(SkinLoader.imageMap["cursor"], (mX, mY))
         # update the display
         pygame.display.update()
 
@@ -167,11 +175,12 @@ class gameStateManager:
 
     # method for showing chat overlay
     def showChat(self):
-
+        print("Shown Chat")
         self.chatToggle = not self.chatToggle
-        pygame.display.set_mode((300,300))
-        print("Toggled Chat")
-        return
+        if not self.chatToggle:
+            self.uiManager.hideGroup("ChatWindow")
+        else:
+            self.uiManager.showGroup("ChatWindow")
 
     def showExtendedChat(self):
 

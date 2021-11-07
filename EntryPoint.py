@@ -1,13 +1,13 @@
 """ ---------- OSU MODULES ---------- """
-import config
+import config                               # for program global variables
 
 """ ---------- PYTHON MODULES ---------- """
-import os
-import ctypes
-from win32api import GetSystemMetrics
-import glob
-import logging
-import time
+import os                                   # for joining directories
+import ctypes                               # for btypassing windows' UI scaling
+from win32api import GetSystemMetrics       # for getting system resolution
+import logging                              # for logging errors 
+import sys
+
 
 
 """
@@ -18,6 +18,9 @@ Since it is only ever called once there is no point in having it be a gamestate
 
 # loads the user's saved settings from their config file
 def loadSettings():
+
+    if not os.path.isfile("%s/osu!.cfg"%config.DEFAULT_PATH):
+        sys.exit(0)
 
     # loop through all lines in the config file
     with open("%s/osu!.cfg"%config.DEFAULT_PATH, "r", encoding='utf-8') as f:
@@ -59,9 +62,18 @@ def getOsuPixelScaling():
 
 def startGame():
 
+    try:
+        import pygame
+        if(pygame.version.vernum[0]) < 2:
+            print("You do not have the correct version of pygame installed, try installing pygame 2 and try again")
+            return
+    except ModuleNotFoundError:
+        print("You do not have pygame installed. Terminating program...")
+        return
+    pygame.init()
+    pygame.mixer.pre_init(44100, 16, 2, 4096)
     # create the logger that will be used throught the program
     logging.basicConfig(filename='log.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-
     # prevent the program from scaling due to windows default UI scaling
     ctypes.windll.user32.SetProcessDPIAware()
     # set osu's default resolution
@@ -70,25 +82,18 @@ def startGame():
     config.DEFAULT_PATH = os.path.dirname(os.path.realpath(__file__))
     # store the current screen resolution
     config.SCREEN_RESOLUTION = (GetSystemMetrics(0), GetSystemMetrics(1))
+    print(f"The resolution of your screen is {config.SCREEN_RESOLUTION}")
     #print("path:" + os.path.dirname(os.path.realpath(__file__)))
     # load all the user's default settings from the osu!.cfg
     # pygame v2 or higher is needed for a lot of the functions within this program
     # no pygame, no run
-    try:
-        import pygame
-        if(pygame.version.vernum[0]) < 2:
-            print("You do not have the correct version of pygame installed")
-            return
-    except ModuleNotFoundError:
-        print("You do not have pygame installed. Terminating program...")
-        return
+    
     loadSettings()
     
     
     
     
-    pygame.init()
-    pygame.mixer.pre_init(44100, 16, 2, 4096)
+    
     # set the mouse cursor to invisible due to the program using it's own cursor
     pygame.mouse.set_visible(False)
     config.xOffset = int((config.SCREEN_RESOLUTION[0] - config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING)/2)
@@ -96,6 +101,7 @@ def startGame():
     #print(config.keyBindings)
     # we import maingame here as many for the links to assets will not work without being initialized first
     import MainGame
+    
     # start the main program
     currentProcess = MainGame.osuGame()
 

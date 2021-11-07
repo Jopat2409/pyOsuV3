@@ -1,10 +1,13 @@
 
 import pygame
 import pygame.gfxdraw
+from UiManager import uiManager
 import config
 import math
 import sys
 import AiGamestate
+import UiManager
+import UiElements
 
 import BeatmapSelect
 
@@ -101,15 +104,18 @@ class gsMenu:
         bgPath = config.DEFAULT_PATH + '/assets/bg/online_background_ce0fcca19f9d1c89cb28dd1d9946596d.jpg'
 
         # scale the image to the size of the screen
-        bg = pygame.image.load(bgPath)
-        self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION).convert()
+        bg = pygame.image.load(bgPath).convert()
+        self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
 
-        self.mainWindow = pygame.Surface(config.SCREEN_RESOLUTION).convert()
-        self.uiRect = pygame.Surface((config.SCREEN_RESOLUTION[0], int(config.SCREEN_RESOLUTION[1]/8))).convert_alpha()
-        self.uiRect.set_alpha(150)
-        self.uiRect.fill((0,0,0))
+        self.tempRectHeight = int(config.SCREEN_RESOLUTION[1]/8)
+        self.uiRect = pygame.Surface((config.SCREEN_RESOLUTION[0], self.tempRectHeight)).convert_alpha()
+        self.uiRect.set_alpha(125)
+
 
         self.parent = parent
+
+        self.KEY_MAP = {}
+        
 
 
         # --------------- game object components -------------#
@@ -129,10 +135,8 @@ class gsMenu:
 
         
 
-    def getRenderSnapshot(self, interpolation):
+    def getRenderSnapshot(self, interpolation, tempSurface):
 
-        # create the surface that will be blitted to the main window
-        tempSurface = self.mainWindow
         # add the background image
         tempSurface.blit(self.bgIMG, (0,0))
         if config.safeMode:
@@ -143,11 +147,11 @@ class gsMenu:
             _object.render(tempSurface)
         
         tempSurface.blit(self.uiRect, (0,0))
+        tempSurface.blit(self.uiRect, (0,config.SCREEN_RESOLUTION[1]-self.tempRectHeight))
             
 
         #tempSurface.fill((200,0,200))
 
-        return tempSurface
 
                 
         

@@ -1,3 +1,5 @@
+from sys import flags
+from pygame.sprite import Group
 import BeatmapParse
 import pygame
 import config
@@ -5,6 +7,9 @@ import pygame.gfxdraw
 import os
 import BeatmapFrame
 import AiPlayer
+import SkinLoader
+import UiElements
+
 
 class gsBeatmapPlayer:
 
@@ -29,7 +34,7 @@ class gsBeatmapPlayer:
 
         self.isMulti = multi
         
-
+        self.loadAssets()
         # calculate all necessary values for the map, such as relative circle size, approach rate in ms etc
         self.getMapValues()
 
@@ -49,6 +54,8 @@ class gsBeatmapPlayer:
                                "keyPause":self.pauseMap}
         self.buttonFunct = [self.pauseMap, self.retry, self.parent.resumeGamestate]
 
+        
+
         # holds the value of the current combo held by the player
         self.combo = 0
         # holds the value of the maximum combo achieved by the player
@@ -62,7 +69,8 @@ class gsBeatmapPlayer:
 
         self.isPaused = False
 
-        self.mainSurface = pygame.Surface(config.SCREEN_RESOLUTION).convert()
+        self.setupUI()
+
 
         if self.isMulti:
             self.AI = AiPlayer.ArtificialIntelligence("mrekk", "Fool")
@@ -71,6 +79,14 @@ class gsBeatmapPlayer:
         
         # plays the song and begins the beatmap
         self.soundHandler.playSong(self.playingBeatmap["BasePath"]+"/"+self.playingBeatmap["AudioFilename"])
+
+    def setupUI(self):
+        self.parent.uiManager.createGroup("PauseMenu", shownOnCreation=False)
+        self.parent.uiManager.addElement(UiElements.Image(os.path.join(SkinLoader.currentSkinDirectory, "Pause-continue@2x.png"), pygame.Rect(200,200,300,100), flags=["CLICKABLE"]), group="PauseMenu")
+
+    def loadAssets(self):
+
+        SkinLoader.loadBeatmapImages()
 
     """ Function called when a successful circle press is registererd"""
     def hitNote(self, score):
@@ -126,6 +142,8 @@ class gsBeatmapPlayer:
         BeatmapFrame.circleSize = int(config.CURRENT_SCALING*(54.4-4.48*float(self.playingBeatmap["CircleSize"])))
         BeatmapFrame.approachCircleSize = BeatmapFrame.circleSize*2
 
+        SkinLoader.beatmapMap.update({"hitCircle":pygame.transform.scale(SkinLoader.beatmapMap["hitCircle"], (BeatmapFrame.approachCircleSize, BeatmapFrame.approachCircleSize))})
+        SkinLoader.beatmapMap.update({"hitCircleOverlay":pygame.transform.scale(SkinLoader.beatmapMap["hitCircleOverlay"], (BeatmapFrame.approachCircleSize, BeatmapFrame.approachCircleSize))})
         # calculate the respective windows for scores, using the map's overall difficulty value
         self.hitWindows = [((400-20*float(self.playingBeatmap["OverallDifficulty"]))/2)*10,
                            ((280-16*float(self.playingBeatmap["OverallDifficulty"]))/2)*10,
@@ -198,17 +216,11 @@ class gsBeatmapPlayer:
         
 
 
-    def getRenderSnapshot(self, interpolation):
+    def getRenderSnapshot(self, interpolation, tempSurface):
 
-        
-
-        tempSurface = self.mainSurface
         tempSurface.fill((0,0,0))
-        tempSurface.blit(self.bgIMG, (0,0))
-        #tempSurface.fill((0,0,0))
-        
-        
-        #tempSurface.fill((0,0,0))
+        tempSurface.blit(SkinLoader.stateMap["playOverlay"], (0,0))
+        #tempSurface.blit(self.bgIMG, (0,0))
         
 
         
@@ -256,9 +268,7 @@ class gsBeatmapPlayer:
             pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark/2, 950, 2, 100))
     
     def drawPauseMenu(self, surface):
-
-        for button in self.buttonBounds:
-            pygame.draw.rect(surface, config.PINK, button)
+        surface.blit(SkinLoader.stateMap["pauseOverlay"], (0,0))
 
     def checkCircle(self):
 

@@ -2,7 +2,7 @@ import config
 import pygame
 import pygame.gfxdraw
 import BeatmapFrame
-
+import SkinLoader
 
 
 
@@ -19,8 +19,11 @@ class hitCircle:
 
         
     def render(self, cPos, surface):
-        pygame.gfxdraw.filled_circle(surface, self.x, self.y, BeatmapFrame.circleSize, BeatmapFrame.currentComboColor)
-        pygame.gfxdraw.filled_circle(surface, self.x, self.y, int(BeatmapFrame.circleSize*0.9), (0,0,0))
+        #pygame.gfxdraw.filled_circle(surface, self.x, self.y, BeatmapFrame.circleSize, BeatmapFrame.currentComboColor)
+        #pygame.gfxdraw.filled_circle(surface, self.x, self.y, int(BeatmapFrame.circleSize*0.9), (0,0,0))
+
+        surface.blit(SkinLoader.beatmapMap["hitCircle"], (self.x - BeatmapFrame.circleSize, self.y - BeatmapFrame.circleSize))
+        surface.blit(SkinLoader.beatmapMap["hitCircleOverlay"], (self.x - BeatmapFrame.circleSize, self.y - BeatmapFrame.circleSize))
         aOffset = int(BeatmapFrame.circleSize + BeatmapFrame.approachCircleSize * ((self.timingPoint-cPos) / BeatmapFrame.fadeInStart))
         for i in range(5):
             pygame.gfxdraw.aacircle(surface, self.x, self.y, aOffset+i, BeatmapFrame.currentComboColor)
