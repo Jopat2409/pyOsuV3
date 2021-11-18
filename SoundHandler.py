@@ -1,13 +1,13 @@
+""" ---------- PYTHON MODULES ---------- """
+import pygame                               # for audio
+import config                               # for program-global variables
+import os                                   # for creating filepaths
 
-import pygame
-import config
-import os
 
-
-
+"""
+Should ensure that everything is playing according to the rules of osu!
+"""
 class audioStream:
-
-
 
     def __init__(self):
 
@@ -19,45 +19,61 @@ class audioStream:
         self.musicChannel = pygame.mixer.music
 
         # dictionary mapping effects to their respective mp3's
-        self.effects = {}
+        self.effects = {"hitSound":"normal-hitnormal.ogg"}
 
         # set the music volume to the volume saved in the config
         self.musicChannel.set_volume(0.1)
 
-
+    """
+    Plays a defined sound effect
+    """
     def playEffect(self, effect):
 
-        effectSound = pygame.mixer.Sound(os.join(config.skinDirectory,self.effects[effect]))
-
+        # load the sound to play
+        effectSound = pygame.mixer.Sound(os.path.join(config.cSkinDirectory,self.effects[effect]))
+        # play the sound
         self.effectChannel.play(effectSound)
 
 
 
 
 
-    # method called when previewing a beatmap
+    """
+    Method called when previewing a beatmap
+    """
     def previewSong(self, songFile, offset):
-
-        #print("Started {} at {}".format(songFile, offset))
         # load the song file
         self.musicChannel.load(songFile)
         # play the song at the offset specified in the osu file, and make it loop infinitely
         self.musicChannel.play(start=offset/1000,loops=-1)
 
+    """
+    Method for actually playing the song
+    """
     def playSong(self, songFile):
 
+        # load the file
         self.musicChannel.load(songFile)
+        # play the song
         self.musicChannel.play()
     
-
+    """
+    Method for pausing the song
+    """
     def pauseSong(self):
 
         self.musicChannel.pause()
 
+    """
+    Method for resuming the song, pTime is the offset since pausing and resuming in pygame sometimes has a slight offset
+    """
     def resumeSong(self, pTime=0):
+        # if the user has not defined an offset
         if pTime == 0:
+            # unpause
             self.musicChannel.unpause()
         else:
+            # else play the music from the offset
             self.musicChannel.play(start=pTime/1000)
         
 
