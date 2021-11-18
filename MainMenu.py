@@ -1,17 +1,21 @@
+""" ---------- OSU MODULES ---------- """
+import config                               # for accessing program-global variables
+import AiGamestate                          # for next gamestate
+import BeatmapSelect                        # for next gamestate
 
-import pygame
-import pygame.gfxdraw
-from UiManager import uiManager
-import config
-import math
-import sys
-import AiGamestate
-import UiManager
-import UiElements
+""" ---------- PYTHON MODULES ---------- """
+import pygame                               # for rendering
+import pygame.gfxdraw                       # for anti-aliased rendering
+import math                                 # for rounding
+import sys                                  # for exiting program
+import glob                                 # for getting background image
+import random                               # for getting background image
 
-import BeatmapSelect
 
-# class for handling the main button in the middle
+"""
+Class for handling the main UI section of the gamestate
+need to change this and implement a UI manager
+"""
 class MainButton:
 
     def __init__(self, parent):
@@ -47,9 +51,9 @@ class MainButton:
         self.parentClass.newGamestate(BeatmapSelect.gsBeatmapSelect(self.parentClass))
 
     def optionAI(self):
-
+        # sets the gamestate to the ai gamestate
         self.parentClass.newGamestate(AiGamestate.gsNeuralNetworkTrain(self.parentClass))
-
+    
     def defunctFunct(self):
         pass
     
@@ -57,12 +61,15 @@ class MainButton:
         # exit out of the game
         pygame.display.quit()
         pygame.quit()
+        # exit out of the program
         sys.exit(0)
     
     def render(self, surface):
         # render the main osu button depending on wether or not it is active
         if not self.active:
+            # draw the white outline
             pygame.gfxdraw.filled_circle(surface, self.pos[0], self.pos[1], self.radius, config.WHITE)
+            # draw the pink interior
             pygame.gfxdraw.filled_circle(surface, self.pos[0], self.pos[1], self.rRadius, config.PINK)
         else:
             for i in range(3):
@@ -74,13 +81,12 @@ class MainButton:
 
 
     def checkBounds(self, pos):
-        #print("Checking Main menu Bounds")
         # check if the mouse is within the bounds of the main button if it is not already active
         if not self.active:
+            # check if the mouse's x position is within the button's bounds
             if pos[0] >= self.pos[0]-self.radius and pos[0] <= self.pos[0] + self.radius:
-                #print("Xs Match")
+                # check if the mouse's y position is within the button's bounds
                 if pos[1] >= self.pos[1]-self.radius and pos[1] <= self.pos[1] + self.radius:
-                    #print("Within Bounds")
                     self.active = True
                     return True
         else:
@@ -89,6 +95,7 @@ class MainButton:
                 # loop through and check the y values
                 for i in range(3):
                     if pos[1] >= (self.bY + (self.bHeight+self.bMargin)*i) and pos[1] <= (self.bY + (self.bHeight+self.bMargin)*i) + self.bHeight:
+                        # if the mouse is within the button's bounds, run the corresponding function
                         self.functions[i]()
                         return True
 
@@ -101,25 +108,21 @@ class gsMenu:
     def __init__(self, parent):
 
         # set the background image
+        image = glob.glob()
         bgPath = config.DEFAULT_PATH + '/assets/bg/online_background_ce0fcca19f9d1c89cb28dd1d9946596d.jpg'
 
         # scale the image to the size of the screen
         bg = pygame.image.load(bgPath).convert()
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
-
+        # create the shaded bars at the top and bottom of the screen where information goes
         self.tempRectHeight = int(config.SCREEN_RESOLUTION[1]/8)
         self.uiRect = pygame.Surface((config.SCREEN_RESOLUTION[0], self.tempRectHeight)).convert_alpha()
         self.uiRect.set_alpha(125)
-
-
+        # get a reference to the parent gamestatemanager class
         self.parent = parent
-
+        # create the gamestate specific keymap
         self.KEY_MAP = {}
-        
-
-
         # --------------- game object components -------------#
-
         self.buttons = [MainButton(self.parent)]
 
 
@@ -130,6 +133,7 @@ class gsMenu:
 
 
     def buttonNotPressed(self):
+        # set the button to inactive if it is not pressed
         self.buttons[0].active = False
 
 
@@ -139,13 +143,15 @@ class gsMenu:
 
         # add the background image
         tempSurface.blit(self.bgIMG, (0,0))
+        # add a blank screen if safemode is enabled
         if config.safeMode:
             tempSurface.fill((150,150,150))
 
         # render all of the objects
         for _object in self.buttons:
             _object.render(tempSurface)
-        
+
+        # blit the two rectangles that make the UI look cleaner
         tempSurface.blit(self.uiRect, (0,0))
         tempSurface.blit(self.uiRect, (0,config.SCREEN_RESOLUTION[1]-self.tempRectHeight))
             

@@ -1,23 +1,23 @@
 """ ---------- OSU MODULES ---------- """
-import MainMenu
-import config
-import SoundHandler
+import MainMenu                             # for creating the initial gamestate
+import config                               # for accessing program-global variables
+import SoundHandler                         # for handling sound
+import SkinLoader                           # for loading assets
 
 """ ---------- PYTHON MODULES ---------- """
-import queue
-import pygame
-import pygame.gfxdraw
-import ctypes
-import pickle
-import copy
-import traceback
-import logging
-import SkinLoader
+import queue                                # for implementing the gamestate stack
+import pygame                               # for rendering and audio
+import pygame.gfxdraw                       # for anti-aliased rendering
+import ctypes                               # for bypassing windows UI scaling
+import pickle                               # for serializing gamestates
+import copy                                 # for creating actual copies of gamestates
+import traceback                            # for getting error log
+import logging                              # for logging purposes
+
 
 
 # manages the current gamestate of the game
 class gameStateManager:
-
 
     def __init__(self,):
 
@@ -25,32 +25,27 @@ class gameStateManager:
         self.gsStack = queue.LifoQueue()
         # prevents the program from displaying the wrong res due to windows UI scaling
         ctypes.windll.user32.SetProcessDPIAware()
-
         # key functions that are applicable to all gamestates
         self.GLOBAL_KEY_MAP = {"keyToggleChat":self.showChat,
                                "keyToggleExtendedChat":self.showExtendedChat,
                                "keyScreenshot":self.screenshot}
-
         # tracks wether chat is toggled ( applicable to all gamestates )
         self.chatToggle = False
-
-        # inializes the sound handler
-        self.soundStream = SoundHandler.audioStream()
-
-        self.font = pygame.cFont = pygame.font.SysFont('Arial', 40)
-
+        # calculate the size of the cursor based on the user's cursor size
         self.cursorSize = int(100 * float(config.currentSettings["CursorSize"]))
 
         # uses fullscreen width if in fullscreen        
         if int(config.currentSettings["Fullscreen"]) == 1:
-            flags = pygame.FULLSCREEN | pygame.DOUBLEBUF 
+            # flags - DOUBLEBUF for smoother rendering, FULLSCREEN for fullscreen, HWSURFACE for GPU rendering, SRCALPHA for alpha pixel values
             self.window = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.SRCALPHA, 32 )
-            pygame.display.toggle_fullscreen()
         else:
+             # flags - DOUBLEBUF for smoother rendering, FULLSCREEN for fullscreen, HWSURFACE for GPU rendering, SRCALPHA for alpha pixel values
             self.window = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.SRCALPHA, 32 )
         
-        
-
+        # inializes the sound handler
+        self.soundStream = SoundHandler.audioStream()
+        # initialize the sound handler
+        self.font = pygame.cFont = pygame.font.SysFont('Arial', 40)
         # sets the initial gamestate to the main menu
         self.cGamestate = MainMenu.gsMenu(self)
 
@@ -116,56 +111,56 @@ class gameStateManager:
 
     def render(self, interpolation, frames):
 
-        # blit the frame returned by the current gamestate's render method onto the main window
+        # draw the current gamestate onto the main window
         self.cGamestate.getRenderSnapshot(interpolation, self.window)
-        # draw the chat popup if it is enabled
-        if self.chatToggle:
-            pygame.draw.rect(self.window,(0,0,0),(200,150,100,50))
             
-        
-        if frames >= 60:
-            color = (0,255,0)
-        else:
-            color = (255,0,0)
-        self.uiManager.render(self.window)
+        # set the fps indicator color to green if frames are above 60
+        color = (0, 255, 255) if frames >= 60 else (255,0,0)
+        # create the fps count surface
         fps = self.font.render("{}".format(frames), True, color)
+        # draw the fps counter to the bottom right of the screen
         self.window.blit(fps, (config.SCREEN_RESOLUTION[0]-fps.get_width(),config.SCREEN_RESOLUTION[1]-fps.get_height()))
 
+        # render the UI
+        self.uiManager.render(self.window)
+        
         # render the cursor at the current mouse position
         mX, mY = pygame.mouse.get_pos()
         mX -= self.cursorSize / 2
         mY -= self.cursorSize / 2
+        # blit the cursor image onto the screen
         self.window.blit(SkinLoader.imageMap["cursor"], (mX, mY))
         # update the display
         pygame.display.update()
 
-
+    """
+    Function to map inputs to gamestate-specific functions
+    """
     def mapInput(self, inputs):
 
         # loop through all of the key inputs
         for inputEvent in inputs:
             #print(inputEvent)
-            
             try:
                 # check the global key table for any functions to be called
                 self.GLOBAL_KEY_MAP[inputEvent]()
                 # check the current gamestate key table for functions to be called
-
             except KeyError:
+                # warn the log that the key does not exist
                 logging.warning(traceback.format_exc())
-
+            
             try:
+                # check the gamestate specific keymap for any events
                 self.cGamestate.KEY_MAP[inputEvent]()
             except KeyError:
+                # warn the log that the key does not exist
                 logging.warning(traceback.format_exc())
 
     def checkButtonBounds(self, pos):
-        #print("Checking Bounds")
+        
         for button in self.cGamestate.buttons:
             if button.checkBounds(pos):
                 return
-
-        #print("no button pressed")
         try:
             self.cGamestate.buttonNotPressed()
         except AttributeError:
