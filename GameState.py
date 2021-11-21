@@ -1,18 +1,19 @@
 """ ---------- OSU MODULES ---------- """
-import MainMenu
-import config
-import SoundHandler
+import MainMenu                             # for creating the initial gamestate
+import config                               # for accessing program-global variables
+import SoundHandler                         # for handling sound
+import SkinLoader                           # for loading assets
 
 """ ---------- PYTHON MODULES ---------- """
-import queue
-import pygame
-import pygame.gfxdraw
-import ctypes
-import pickle
-import copy
-import traceback
-import logging
-import SkinLoader
+import queue                                # for implementing the gamestate stack
+import pygame                               # for rendering and audio
+import pygame.gfxdraw                       # for anti-aliased rendering
+import ctypes                               # for bypassing windows UI scaling
+import pickle                               # for serializing gamestates
+import copy                                 # for creating actual copies of gamestates
+import traceback                            # for getting error log
+import logging                              # for logging purposes
+
 
 
 """
@@ -21,33 +22,33 @@ All gamestates must contain at the least, a render, update and mapInput function
 """
 class gameStateManager:
 
-    def __init__(self):
+    def __init__(self,):
 
         # creates the stack used for storing paused gamestates
         self.gsStack = queue.LifoQueue()
+        # prevents the program from displaying the wrong res due to windows UI scaling
+        ctypes.windll.user32.SetProcessDPIAware()
         # key functions that are applicable to all gamestates
         self.GLOBAL_KEY_MAP = {"keyToggleChat":self.showChat,
                                "keyToggleExtendedChat":self.showExtendedChat,
                                "keyScreenshot":self.screenshot}
-        # tracks whether chat is toggled ( applicable to all gamestates )
+        # tracks wether chat is toggled ( applicable to all gamestates )
         self.chatToggle = False
-        # works out the size in pixels of the cursor, based off of the CursorSize setting in .cfg
+        # calculate the size of the cursor based on the user's cursor size
         self.cursorSize = int(100 * float(config.currentSettings["CursorSize"]))
 
         # uses fullscreen width if in fullscreen        
         if int(config.currentSettings["Fullscreen"]) == 1:
-            # DOUBLEBUF for fluid rendering, FULLSCREEN for fullscreen, HWSURFACE for GPU rendering, SRCALPHA for alpha pixels
+            # flags - DOUBLEBUF for smoother rendering, FULLSCREEN for fullscreen, HWSURFACE for GPU rendering, SRCALPHA for alpha pixel values
             self.window = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.SRCALPHA, 32 )
         else:
-            # DOUBLEBUF for fluid rendering, HWSURFACE for GPU rendering, SRCALPHA for alpha pixels
-            self.window = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.SRCALPHA, 32 )
-
-        # prevents the program from displaying the wrong res due to windows UI scaling
-        ctypes.windll.user32.SetProcessDPIAware()
-        # initializes the default font
-        self.font = pygame.cFont = pygame.font.SysFont('Arial', 40)
+             # flags - DOUBLEBUF for smoother rendering, FULLSCREEN for fullscreen, HWSURFACE for GPU rendering, SRCALPHA for alpha pixel values
+            self.window = pygame.display.set_mode(config.SCREEN_RESOLUTION, pygame.DOUBLEBUF | pygame.FULLSCREEN | pygame.HWSURFACE | pygame.SRCALPHA, 32 )
+        
         # inializes the sound handler
         self.soundStream = SoundHandler.audioStream()
+        # initialize the sound handler
+        self.font = pygame.cFont = pygame.font.SysFont('Arial', 40)
         # sets the initial gamestate to the main menu
         self.cGamestate = MainMenu.gsMenu(self)
 
@@ -117,11 +118,8 @@ class gameStateManager:
     """
     def render(self, interpolation, frames):
 
-        # draw the current gamestate onto the main menu
+        # draw the current gamestate onto the main window
         self.cGamestate.getRenderSnapshot(interpolation, self.window)
-        # draw the chat popup if it is enabled
-        if self.chatToggle:
-            pygame.draw.rect(self.window,(0,0,0),(200,150,100,50))
             
         # render the UI
         self.uiManager.render(self.window)
@@ -132,6 +130,9 @@ class gameStateManager:
         # draw the fps count to the bottom left of the screen
         self.window.blit(fps, (config.SCREEN_RESOLUTION[0]-fps.get_width(),config.SCREEN_RESOLUTION[1]-fps.get_height()))
 
+        # render the UI
+        self.uiManager.render(self.window)
+        
         # render the cursor at the current mouse position
         mX, mY = pygame.mouse.get_pos() # get the position of the cursor
         mX -= self.cursorSize / 2       # factor in the cursor radius
@@ -141,33 +142,34 @@ class gameStateManager:
         # update the display
         pygame.display.update()
 
-
+    """
+    Function to map inputs to gamestate-specific functions
+    """
     def mapInput(self, inputs):
 
         # loop through all of the key inputs
         for inputEvent in inputs:
             #print(inputEvent)
-            
             try:
                 # check the global key table for any functions to be called
                 self.GLOBAL_KEY_MAP[inputEvent]()
                 # check the current gamestate key table for functions to be called
-
             except KeyError:
+                # warn the log that the key does not exist
                 logging.warning(traceback.format_exc())
-
+            
             try:
+                # check the gamestate specific keymap for any events
                 self.cGamestate.KEY_MAP[inputEvent]()
             except KeyError:
+                # warn the log that the key does not exist
                 logging.warning(traceback.format_exc())
 
     def checkButtonBounds(self, pos):
-        #print("Checking Bounds")
+        
         for button in self.cGamestate.buttons:
             if button.checkBounds(pos):
                 return
-
-        #print("no button pressed")
         try:
             self.cGamestate.buttonNotPressed()
         except AttributeError:

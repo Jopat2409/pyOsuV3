@@ -1,28 +1,26 @@
+""" ---------- OSU MODULES ---------- """
+import config                               # for program-global variables
+import BeatmapParse                         # for parsing beatmaps
+import BeatmapPlay                          # for playing beatmaps
+import SkinLoader                           # for loading assets
+""" ---------- PYTHON MODULES ---------- """
+import random                               # for initializing song choice
+import pickle                               # for serializing beatmaps
+import os                                   # for joining paths
+import glob                                 # for traversing beatmap directory
+import pygame                               # for rendering
+import math                                 # for rounding
+import time                                 # for syncing beatmap and audio
+import sys                                  # for exiting game
+import checksumdir                          # for getting hash of beatmap files
 
-import config
-import BeatmapParse
-import BeatmapPlay
-
-import random
-import pickle
-import os
-import glob
-import pygame
-import math
-import time
-import sys
-import checksumdir
-import SkinLoader
 
 
 class gsBeatmapSelect:
 
-
-
-
-
     def __init__(self, parentClass):
 
+        # gets a reference to the parent class
         self.parentClass = parentClass
 
         # store a pointer to the sound handler
@@ -31,11 +29,12 @@ class gsBeatmapSelect:
         # array of beatmaps
         self.beatmaps = []
 
+        # gamestate Unique identifier
         self.UUID = "gsBeatmapSelect"
 
 
         
-        cPath = bgPath = config.DEFAULT_PATH + '\\.temp\\beatmapSelect.dat'
+        # gets the current osu background
         bgPath = config.DEFAULT_PATH + '/assets/bg/online_background_68261587a4e3fbe77cad07120ee1e864.jpg'
         bg = pygame.image.load(bgPath)
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
@@ -70,6 +69,7 @@ class gsBeatmapSelect:
 
         bmLoadStart = time.time()
 
+        cPath = bgPath = config.DEFAULT_PATH + '\\.temp\\beatmapSelect.dat'
         # checks to see if a beatmap cache already exists
         if os.path.isfile(cPath):
             

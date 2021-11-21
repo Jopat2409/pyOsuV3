@@ -25,7 +25,8 @@ class gsBeatmapPlayer:
         #print(PATH)
         # load the data from the beatmap file which will be used to display and run the map
         self.playingBeatmap = PATH
-        
+
+        # parse the full beatmap
         self.hitObjects = BeatmapParse.fullParse(self.playingBeatmap["osuPath"])
 
         self.pausedTime = 0
@@ -262,10 +263,10 @@ class gsBeatmapPlayer:
 
         for i in range(0,3):
             tempSize = self.hitWindows[i]/2
-            pygame.draw.rect(surface, self.timingColors[i], (int((config.SCREEN_RESOLUTION[0] - tempSize)/2),1000,tempSize, 20))
+            pygame.draw.rect(surface, self.timingColors[i], (int((config.SCREEN_RESOLUTION[0] - tempSize)/2),config.SCREEN_RESOLUTION[1]-50,tempSize, 20))
         
         for hitMark in self.hitTimings:
-            pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark/2, 950, 2, 100))
+            pygame.draw.rect(surface, (255,255,255), (int(config.SCREEN_RESOLUTION[0]/2)+hitMark/2, config.SCREEN_RESOLUTION[1]-90, 2, 100))
     
     def drawPauseMenu(self, surface):
         surface.blit(SkinLoader.stateMap["pauseOverlay"], (0,0))
@@ -278,13 +279,13 @@ class gsBeatmapPlayer:
         dY = abs(mY - self.hitObjects[0].y)
         #print("Evaluating mouse press {},{} with circle {},{}".format(mX, mY, self.hitObjects[0][0], self.hitObjects[0][1]))
 
-        if dX > self.radius or dY > self.radius:
+        if dX > BeatmapFrame.circleSize or dY > BeatmapFrame.circleSize:
             return False
 
-        if dX + dY <= self.radius:
+        if dX + dY <= BeatmapFrame.circleSize:
             return True
 
-        if dX**2 + dY**2 <= self.radius**2:
+        if dX**2 + dY**2 <= BeatmapFrame.circleSize**2:
             return True
         else:
             return False
@@ -344,6 +345,7 @@ class gsBeatmapPlayer:
         try:
             if self.hitObjects[0].timingPoint < self.getCurrentPos():
                 self.missNote()
+                self.soundHandler.playEffect("hitSound")
         except IndexError:
             pass
         

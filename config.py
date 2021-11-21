@@ -9,6 +9,8 @@ currentSettings = {}
 
 safeMode = False
 
+useOsuTextures = True
+
 # program entity ID generation
 
 class idGenerator:
