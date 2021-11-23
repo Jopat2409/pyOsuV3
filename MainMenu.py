@@ -109,11 +109,11 @@ class gsMenu:
     def __init__(self, parent):
 
         # set the background image
-        images = glob.glob(os.path.join(config.DEFAULT_PATH, "assets/bg/", "*.jpg"))
-        bgPath = os.path.join(config.DEFAULT_PATH, "assets/bg/", random.choice(images))
+        images = glob.glob(os.path.join(config.DEFAULT_PATH, "assets/bg", "*.jpg"))
+        imgToRender = os.path.join(config.DEFAULT_PATH, "assets/bg", random.choice(images))
 
         # scale the image to the size of the screen
-        bg = pygame.image.load(bgPath).convert()
+        bg = pygame.image.load(imgToRender).convert()
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
         # create the shaded bars at the top and bottom of the screen where information goes
         self.tempRectHeight = int(config.SCREEN_RESOLUTION[1]/8)

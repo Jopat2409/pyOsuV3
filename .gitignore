@@ -131,3 +131,4 @@ log.log
 .temp/beatmapSelect.dat
 *.log
 .temp/
+*.log

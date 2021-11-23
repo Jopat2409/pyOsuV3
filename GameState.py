@@ -16,7 +16,10 @@ import logging                              # for logging purposes
 
 
 
-# manages the current gamestate of the game
+"""
+Class that handles and runs all of the functions and classes associated with the current gamestate
+All gamestates must contain at the least, a render, update and mapInput function
+"""
 class gameStateManager:
 
     def __init__(self,):
@@ -52,7 +55,8 @@ class gameStateManager:
     def setUiManager(self, uiManager):
         self.uiManager = uiManager
 
-    """hashes all relevant info about a gamestate, should be used when the time between resuming the gamestate is relatively large, or if the new gamestate
+    """
+    hashes all relevant info about a gamestate, should be used when the time between resuming the gamestate is relatively large, or if the new gamestate
     requires a larger amount of processing power / memory
     """
     def suspendGamestate(self, NEW_GAMESTATE):
@@ -60,6 +64,7 @@ class gameStateManager:
         filePath = config.DEFAULT_PATH + "/" + "%s.obj"%self.cGamestate.UUID
         # opens the file
         file = open(filePath, 'w')
+        # create a copy of the gamestate to save
         tempGstate = copy.deepcopy(self.cGamestate)
         # uses pickle to write the gamestate to the file
         pickle.dump(tempGstate, file)
@@ -94,7 +99,7 @@ class gameStateManager:
         # if the tempGamestate is a string then it must be a UUID, signifying a cached gamestate
         if isinstance(tempGamestate, str):
             # load the gamestate back up from the file
-            filePath = config.DEFAULT_PATH + "/" + "%s.obj"%tempGamestate
+            filePath = config.DEFAULT_PATH + "//" + "%s.obj"%tempGamestate
             del(self.cGamestate)
             self.cGamestate = pickle.load(filePath)
             
@@ -108,27 +113,31 @@ class gameStateManager:
         # update current gamestate
         self.cGamestate.update()
             
-
+    """
+    Draws everything that needs to be drawn to the surface then updates the screen
+    """
     def render(self, interpolation, frames):
 
         # draw the current gamestate onto the main window
         self.cGamestate.getRenderSnapshot(interpolation, self.window)
             
+        # render the UI
+        self.uiManager.render(self.window)
         # set the fps indicator color to green if frames are above 60
-        color = (0, 255, 255) if frames >= 60 else (255,0,0)
+        color = (0,255,255) if frames >= 60 else (255,0,0)
         # create the fps count surface
         fps = self.font.render("{}".format(frames), True, color)
-        # draw the fps counter to the bottom right of the screen
+        # draw the fps count to the bottom left of the screen
         self.window.blit(fps, (config.SCREEN_RESOLUTION[0]-fps.get_width(),config.SCREEN_RESOLUTION[1]-fps.get_height()))
 
         # render the UI
         self.uiManager.render(self.window)
         
         # render the cursor at the current mouse position
-        mX, mY = pygame.mouse.get_pos()
-        mX -= self.cursorSize / 2
-        mY -= self.cursorSize / 2
-        # blit the cursor image onto the screen
+        mX, mY = pygame.mouse.get_pos() # get the position of the cursor
+        mX -= self.cursorSize / 2       # factor in the cursor radius
+        mY -= self.cursorSize / 2       # ""
+        # blit the cursor to the x and y calculated 
         self.window.blit(SkinLoader.imageMap["cursor"], (mX, mY))
         # update the display
         pygame.display.update()

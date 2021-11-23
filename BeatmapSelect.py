@@ -109,9 +109,6 @@ class gsBeatmapSelect:
 
         # points to the current index of the beatmap currently selected
         self.cBeatmap = -1
-        #print(len(self.beatmaps))
-        #print(self.cBeatmap)
-        print(self.beatmaps)
 
     """
     Called when the mouse button is pressed down
@@ -172,7 +169,7 @@ class gsBeatmapSelect:
             bmOffset = beatmap[1] + self.offset
             if mY >= bmOffset and mY <= (bmOffset + self.bmHeight):
                 if self.cBeatmap == bmCount:
-                    self.parentClass.pauseGamestate(BeatmapPlay.gsBeatmapPlayer(self.beatmaps[self.cBeatmap], self.parentClass, True))
+                    self.parentClass.pauseGamestate(BeatmapPlay.gsBeatmapPlayer(self.beatmaps[self.cBeatmap], self.parentClass, False))
                 else:
                     self.cBeatmap = bmCount
                     self.soundHandler.previewSong(self.beatmaps[bmCount]["BasePath"]+"/"+self.beatmaps[bmCount]["AudioFilename"],int(self.beatmaps[bmCount]["PreviewTime"]))
