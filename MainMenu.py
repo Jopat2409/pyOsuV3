@@ -10,6 +10,7 @@ import math                                 # for rounding
 import sys                                  # for exiting program
 import glob                                 # for getting background image
 import random                               # for getting background image
+import os                                   # for joining paths
 
 
 """
@@ -108,11 +109,11 @@ class gsMenu:
     def __init__(self, parent):
 
         # set the background image
-        image = glob.glob()
-        bgPath = config.DEFAULT_PATH + '/assets/bg/online_background_ce0fcca19f9d1c89cb28dd1d9946596d.jpg'
+        images = glob.glob(os.path.join(config.DEFAULT_PATH, "assets/bg", "*.jpg"))
+        imgToRender = os.path.join(config.DEFAULT_PATH, "assets/bg", random.choice(images))
 
         # scale the image to the size of the screen
-        bg = pygame.image.load(bgPath).convert()
+        bg = pygame.image.load(imgToRender).convert()
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
         # create the shaded bars at the top and bottom of the screen where information goes
         self.tempRectHeight = int(config.SCREEN_RESOLUTION[1]/8)

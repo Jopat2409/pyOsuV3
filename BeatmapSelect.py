@@ -104,9 +104,6 @@ class gsBeatmapSelect:
 
         # points to the current index of the beatmap currently selected
         self.cBeatmap = -1
-        #print(len(self.beatmaps))
-        #print(self.cBeatmap)
-        print(self.beatmaps)
 
     def mButtonDown(self):
 
