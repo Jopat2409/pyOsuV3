@@ -34,50 +34,54 @@ class gsBeatmapSelect:
 
 
         
-        # gets the current osu background
+        # gets the current osu multiplayer background
         bgPath = config.DEFAULT_PATH + '/assets/bg/online_background_68261587a4e3fbe77cad07120ee1e864.jpg'
+        # load the background intoa pygame
         bg = pygame.image.load(bgPath)
+        # scale it to the size of the screen
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
 
-
+        
         self.beatmapBounds = []
 
         # hard coded number representing how many beatmaps are shown on screen at once
-        self.BMS = 7            # beatmaps per screen
-        self.bmHeight = 150     # height of beatmap
-        self.bmMargin = 10      # space between beatmaps
-        self.bmOffset = 15      # offset from side of container
-
+        self.BMS = 7                # beatmaps per screen
+        self.bmHeight = 150         # height of beatmap
+        self.bmMargin = 10          # space between beatmaps
+        self.bmOffset = 15          # offset from side of container
+    
         # previous y coordinate of the mouse, used to scroll through beatmaps
         self.prevMY = 0
 
         # hard coded integers to do with movement of beatmap container
-        self.offset = 0
-        self.scrolling = False
-        self.decelerating = False
-        self.velTotal = 0
-        self.velCount = 0
-        self.velY = 0
-        self.decel = 1
-        self.decelCount = 0
-        self.maxMouseMovement = 5
+        self.offset = 0             # current offset of the beatmap array
+        self.scrolling = False      # wether or not the user is scrolling
+        self.decelerating = False   # used for smooth scrolling
+        self.velTotal = 0           # used for smooth scrolling
+        self.velCount = 0           # used for smooth scrolling
+        self.velY = 0               # current velocity of the beatmap container
+        self.decel = 1              # current decelleration
+        self.decelCount = 0         # used for smooth scrolling
+        self.maxMouseMovement = 5   # how much mouse input is considerd when decelerating
 
-
+        # intialize the default font
         self.font = pygame.font.SysFont('Arial', 25)
 
+        # load the assets for the beatmap select gamestate        
         SkinLoader.loadBeatmapSelectImages()
-
+        # initialize the timer for timing how long it takes to load beatmaps
         bmLoadStart = time.time()
-
-        cPath = bgPath = config.DEFAULT_PATH + '\\.temp\\beatmapSelect.dat'
+        # checks for beatmap cache
+        cPath = config.DEFAULT_PATH + '\\.temp\\beatmapSelect.dat'
         # checks to see if a beatmap cache already exists
         if os.path.isfile(cPath):
-            
             # if it does, load the objects stored in at directory cPath as self.beatmaps
             data = None
+            # read bytes of the cache file
             with open(cPath, 'rb') as file:
-                print("Loaded pre-loaded beatmaps")
+                # store the beatmap information
                 data = pickle.load(file)
+            # store the beatmap array in the current beatmap array
             self.beatmaps = data[0]
         else:
             # if it does not exist
@@ -86,6 +90,7 @@ class gsBeatmapSelect:
             # loop through all beatmap directories
             for beatmap in os.listdir("%s/beatmaps/"%config.DEFAULT_PATH):
                 PATH = "%s\\beatmaps\\%s"%(config.DEFAULT_PATH, beatmap)
+                # append the checksum of the beatmap directory (used for loading when changed)
                 bmParsed.append(checksumdir.dirhash(PATH))
                 # loop through all .osu files in beatmap directory
                 for diff in glob.glob(PATH + "/" + "*.osu"):
@@ -95,12 +100,12 @@ class gsBeatmapSelect:
             print(f"Loaded {count} new beatmaps!")
             # writes it to cPath when all beatmaps are parsed
             with open(cPath, 'wb') as beatmapFile:
-                tempData = (self.beatmaps, bmParsed, checksumdir.dirhash("%s/beatmaps/"%config.DEFAULT_PATH))
+                tempData = (self.beatmaps, bmParsed)
                 pickle.dump(tempData, beatmapFile)
+        # calculate the bounds of all of the buttons / beatmap selection buttons
         self.calculateBmBounds()
+        # output the time taken to load the beatmaps (DEBUG)
         print("It took {}s to load all beatmaps".format(time.time()-bmLoadStart))
-        #print(self.beatmaps)
-
 
         # points to the current index of the beatmap currently selected
         self.cBeatmap = -1
@@ -108,11 +113,13 @@ class gsBeatmapSelect:
         #print(self.cBeatmap)
         print(self.beatmaps)
 
+    """
+    Called when the mouse button is pressed down
+    """
     def mButtonDown(self):
-
-        #print("Mouse pressed")
-
+        # get the current mouse position
         self.prevMousePos = pygame.mouse.get_pos()
+        # unpack the tuple
         mX, mY = self.prevMousePos
         if (mX > (config.SCREEN_RESOLUTION[0] / 3)*2) and mX < config.SCREEN_RESOLUTION[0]:
             self.scrolling = True

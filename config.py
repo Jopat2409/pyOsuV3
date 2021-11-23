@@ -11,6 +11,10 @@ safeMode = False
 
 useOsuTextures = True
 
+currentMods = []
+
+
+
 # program entity ID generation
 
 class idGenerator:
