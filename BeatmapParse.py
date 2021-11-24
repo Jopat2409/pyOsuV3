@@ -1,13 +1,14 @@
 
-
 import re
 
 import config
 import HitObject
 
 
-# only reads the necessary data for viewing the beatmap not playing
-#returns a tuple containing (metadata, diff data, audiofile, bgfile)
+"""
+Only parses the necessary information for displaying the beatmap
+beatmapPath: path to the beatmap
+"""
 def shallowRead(beatmapPath, basePath):
 
     # stores the current section of the beatmap that is being parsed
