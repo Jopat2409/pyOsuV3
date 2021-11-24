@@ -118,8 +118,11 @@ class gsBeatmapSelect:
         self.prevMousePos = pygame.mouse.get_pos()
         # unpack the tuple
         mX, mY = self.prevMousePos
+        # if the x position is within the bounds of the beatmap bounding box
         if (mX > (config.SCREEN_RESOLUTION[0] / 3)*2) and mX < config.SCREEN_RESOLUTION[0]:
+            # scrolling true
             self.scrolling = True
+            # set the previous mouse position
             self.prevMY = pygame.mouse.get_pos()[1]
 
     def calculateBmBounds(self):
@@ -240,40 +243,29 @@ class gsBeatmapSelect:
                 print(self.beatmaps[bmNumber-1])
                 sys.exit(0)
             surface.blit(self.font.render(tempString, True, (0,0,0)), (rectX, int(beatmap[1]+self.offset)))
-            
-
         
-        
-
-            
-
-        
-
-        
-
+    """
+    Render the gamestate
+    interpolation: ?
+    tempSurface: surface to draw to
+    """
     def getRenderSnapshot(self, interpolation, tempSurface):
-
+        
+        # blit the backgroud image
         tempSurface.blit(self.bgIMG, (0,0))
+        # if safe mode is enabled, draw over the background image
         if config.safeMode:
             tempSurface.fill((150,150,150))
 
+        # create the frame that holds the beatmap selection buttons
         beatmapFrame = pygame.Surface((config.SCREEN_RESOLUTION[0] / 3, config.SCREEN_RESOLUTION[1]), pygame.SRCALPHA, 32)
         beatmapFrame.convert_alpha()
         
-
-        #beatmapFrame.fill((0,0,0))
+        # blit the beatmap rectangles onto the frame
         self.drawBeatmapRects(beatmapFrame)
 
+        # blit the beatmap frame onto the main surface
         tempSurface.blit(beatmapFrame, ((config.SCREEN_RESOLUTION[0] / 3)*2,0))
 
+        # blit the beatmap selection overlay
         tempSurface.blit(SkinLoader.stateMap["selectOverlay"], (0,0))
-
-        return tempSurface
-                
-            
-            
-
-        # this is for loading up all of the beatmap information that is required
-
-
-        
