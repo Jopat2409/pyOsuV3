@@ -6,7 +6,7 @@ import os                                   # for joining directories
 import ctypes                               # for btypassing windows' UI scaling
 from win32api import GetSystemMetrics       # for getting system resolution
 import logging                              # for logging errors 
-import sys
+import sys                                  # for exiting program
 import glob                                 # for finding cfg file 
 from shutil import copyfile                 # for copying cfg file
 
@@ -104,8 +104,9 @@ def startGame():
     
     # set the mouse cursor to invisible due to the program using it's own cursor
     pygame.mouse.set_visible(False)
-    config.xOffset = int((config.SCREEN_RESOLUTION[0] - config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING)/2)
-    config.yOffset = 50
+    config.xOffset = int((config.SCREEN_RESOLUTION[0] - config.SCALED_RESOLUTION[0])/2)
+    config.yOffset = int(50*config.CURRENT_SCALING)
+    print(f"Main width: {config.SCREEN_RESOLUTION[0]}, Scaled Width:{config.SCALED_RESOLUTION[0]}, X offset: {config.xOffset}")
     #print(config.keyBindings)
     # we import maingame here as many for the links to assets will not work without being initialized first
     import MainGame

@@ -32,7 +32,10 @@ class ArtificialIntelligence:
         self.getMouseEvents()
         # set ready to true
         self.isReady = True
-
+    
+    """
+    
+    """
     def getCursorPos(self, timePos, verbose=False):
 
         if verbose:
