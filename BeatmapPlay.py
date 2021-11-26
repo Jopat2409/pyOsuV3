@@ -77,8 +77,6 @@ class gsBeatmapPlayer:
         self.hitTimings = []
         # holds wether or not the map is paused
         self.isPaused = False
-        # sets up the UI for the gamestate
-        self.setupUI()
 
         # if multiplayer is enabled
         if self.isMulti:

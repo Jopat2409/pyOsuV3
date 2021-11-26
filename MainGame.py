@@ -1,8 +1,6 @@
 """ ---------- OSU MODULES ---------- """
 import GameState                            # for handling different gamestates
 import config                               # for program global variables
-import UiManager                            # for managing UI elements
-import UiElements                           # for creating UI elements
 import SkinLoader                           # for loading assets
 
 """ ---------- PYTHON MODULES ---------- """
@@ -33,12 +31,6 @@ class osuGame():
         self.frames = 0
         self.updates = 0
 
-        # initializes the UI manager 
-        self.uiManager = UiManager.uiManager()
-        # passes the ui manager to the gamestate manager
-        self.gsManager.setUiManager(self.uiManager)
-        # creates the default UI used 
-        self.createDefaultUi()
         # loads all necessary assets
         SkinLoader.loadImageMaps()
         
@@ -46,11 +38,6 @@ class osuGame():
         # starts the game loop
         self.gameLoop()
 
-    """ Method for creating the default UI used throughout all gamestates """
-    def createDefaultUi(self):
-
-        # create the chat window group
-        self.uiManager.createGroup("ChatWindow", shownOnCreation=False)
         
     def defunctFunct(self):
         print("Worked")
@@ -144,7 +131,5 @@ class osuGame():
                     logging.warning(traceback.format_exc())
                     #print(traceback.format_exc())
 
-            # pass the event into the ui manager for seperate event handling
-            self.uiManager.handleEvents(event.type)
     
         

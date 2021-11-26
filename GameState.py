@@ -52,8 +52,6 @@ class gameStateManager:
         # sets the initial gamestate to the main menu
         self.cGamestate = MainMenu.gsMenu(self)
 
-    def setUiManager(self, uiManager):
-        self.uiManager = uiManager
 
     """
     Hashes all relevant info about a gamestate, should be used when the time between resuming the gamestate is relatively large, or if the new gamestate
@@ -126,17 +124,12 @@ class gameStateManager:
         # draw the current gamestate onto the main window
         self.cGamestate.getRenderSnapshot(interpolation, self.window)
             
-        # render the UI
-        self.uiManager.render(self.window)
         # set the fps indicator color to green if frames are above 60
         color = (0,255,255) if frames >= 60 else (255,0,0)
         # create the fps count surface
         fps = self.font.render("{}".format(frames), True, color)
         # draw the fps count to the bottom left of the screen
         self.window.blit(fps, (config.SCREEN_RESOLUTION[0]-fps.get_width(),config.SCREEN_RESOLUTION[1]-fps.get_height()))
-
-        # render the UI
-        self.uiManager.render(self.window)
         
         # render the cursor at the current mouse position
         mX, mY = pygame.mouse.get_pos() # get the position of the cursor
@@ -186,10 +179,6 @@ class gameStateManager:
     def showChat(self):
         print("Shown Chat")
         self.chatToggle = not self.chatToggle
-        if not self.chatToggle:
-            self.uiManager.hideGroup("ChatWindow")
-        else:
-            self.uiManager.showGroup("ChatWindow")
 
     def showExtendedChat(self):
 
