@@ -1,8 +1,8 @@
-
-import re
-
+""" ---------- OSU MODULES ---------- """
 import config
 import HitObject
+""" ---------- PYTHON MODULES ---------- """
+import re
 
 
 """
@@ -65,52 +65,62 @@ def shallowRead(beatmapPath, basePath):
                     pass
 
             
-# reads the full file ready to be parsed
+"""
+Reads all the necessary data for the song to be played
+"""
 def fullParse(beatmapPath):
 
-    reading = False
-    cSection = ""
-    combo = 0
+    reading = False         # initializes the reading state to false
+    cSection = ""           # initializes the current section
+    combo = 0               # initializes the current combo
 
-    hitObjects = []
+    hitObjects = []         # initializes the hitObjects array
 
-
+    # open the beatmap file with utf-8 encoding 
     with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:
 
+        # loop through the .osu file
         for line in cBeatmap:
+            # get the value between the [] (if applicable)
             tempSearch = re.search(r"\[([A-Za-z0-9_]+)\]", line)
 
             try:
+                # if there was a value to be found, set it to the current section and skip the line
                 cSection = tempSearch.group(1)
                 continue
             except:
+                # else keep reading
                 pass
-
+            # if the line being read is under the HitObjects header
             if cSection == "HitObjects":
                 # split the csv
                 tempObj = [i.strip() for i in line.split(",")]
                 
+                # split the bytecode that defines information about the hit object
                 osType = "{0:b}".format(int(tempObj[3]))
+                # get the type of the hitObject
                 osType = osType[::-1]
+                # initialize the object parameters
                 objectParams = []
+                # loop through the values in the type 
                 for i in range(len(osType)):
+                    # if the index is positive (1)
                     if osType[i] == "1":
+                        # add the index to the object parameters
                         objectParams.append(i)
-                if 0 in objectParams:
-                    # if there is a 0, then the object is a hit circle
+                if 0 in objectParams:                                   # 0 denotes a hit circle object
                     hitObjects.append(HitObject.hitCircle(tempObj))
-                elif 1 in objectParams:
+                elif 1 in objectParams:                                 # 1 denotes a slider object
                     hitObjects.append(HitObject.slider(tempObj))
-                elif 3 in objectParams:
+                elif 3 in objectParams:                                 # 3 denotes a spinner object
                     hitObjects.append(HitObject.spinner(tempObj))
-                    
-                
-
-
+    # return the hit objects array
     return hitObjects
 
             
-
+"""
+Parse the beatmap for use within the 
+"""
 def aiParse(beatmapPath):
 
     reading = False
@@ -118,7 +128,6 @@ def aiParse(beatmapPath):
     combo = 0
 
     hitObjects = []
-    osWidth, osHeight = (640, 480)
 
 
     with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:

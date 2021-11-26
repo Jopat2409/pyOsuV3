@@ -56,8 +56,8 @@ class gameStateManager:
         self.uiManager = uiManager
 
     """
-    hashes all relevant info about a gamestate, should be used when the time between resuming the gamestate is relatively large, or if the new gamestate
-    requires a larger amount of processing power / memory
+    Hashes all relevant info about a gamestate, should be used when the time between resuming the gamestate is relatively large, or if the new gamestate
+    Requires a larger amount of processing power / memory
     """
     def suspendGamestate(self, NEW_GAMESTATE):
         # creates an obj file using the gamestate's UUID 
@@ -75,7 +75,8 @@ class gameStateManager:
         self.cGamestate = NEW_GAMESTATE
 
 
-    """simply puts all the info to one side but keeps it stored within the program. Should be used for when the time between resuming is likely to be relatively short
+    """
+    Simply puts all the info to one side but keeps it stored within the program. Should be used for when the time between resuming is likely to be relatively short
     """
     def pauseGamestate(self, NEW_GAMESTATE):
 
@@ -85,13 +86,17 @@ class gameStateManager:
         self.cGamestate = NEW_GAMESTATE
 
 
-    """ Completely changes the gamestate, removing all information about the previous one"""
+    """
+    Completely changes the gamestate, removing all information about the previous one
+    """
     def newGamestate(self, NEW_GAMESTATE):
 
         del(self.cGamestate)
         self.cGamestate = NEW_GAMESTATE
     
-    """ delete the current gamestate and bring the last paused gamestate back to the current gamestate"""
+    """
+    Delete the current gamestate and bring the last paused gamestate back to the current gamestate
+    """
     def resumeGamestate(self):
 
         # gets the last paused gamestate

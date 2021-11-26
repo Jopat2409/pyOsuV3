@@ -15,8 +15,11 @@ currentMods = []
 
 
 
-# program entity ID generation
-
+"""
+Allows creation of unique identifiers for objects
+Allows for the repurposing of identifiers that have gone out of scope
+NOTE not currently used but could see use in the UI 
+"""
 class idGenerator:
 
 

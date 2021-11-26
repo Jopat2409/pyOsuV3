@@ -1,6 +1,7 @@
-
-import pygame
+""" ---------- OSU MODULES ---------- """
 import config
+""" ---------- PYTHON MODULES ---------- """
+import pygame
 
 
 """
@@ -48,36 +49,45 @@ class pickButtonClass:
 
 class gsNeuralNetworkTrain:
 
-
     def __init__(self, parentClass):
-
+        
+        # reference to the parent gamestate manager
         self.parentClass = parentClass
-
+        # create buttons
         self.cButtonWrapper = pickButtonClass(self)
 
+    """
+    Called when the mouse is released
+    """
     def mButtonUp(self):
-
+        # unpack current mouse position
         mX, mY = pygame.mouse.get_pos()
+        # loop through buttons
         for i in self.cButtonWrapper.buttonBounds:
+            # reference to current button
             button = self.cButtonWrapper.buttonBounds[i]
+            # if the mouse's x coordinate is within the bounds of the button
             if mX >= button[0] and mX <= button[2]:
+                # if the mouse's y coordinate is within the bounds of the button
                 if mY >= button[1] and mY < button[3]:
+                    # call the function
                     self.cButtonWrapper.buttonFunct[i]()
+                    # break, as no other button can be pressed
                     break
 
+    """
+    Render gamestate onto the main window
+    tempSurface: surface to be rendered onto
+    """
+    def getRenderSnapshot(self, tempSurface):
 
-    def getRenderSnapshot(self, interpolation):
-
-        tempSurface = pygame.Surface(config.SCREEN_RESOLUTION)
-
-        tempSurface.fill((255,0,0))
-
+        # render the buttons
         self.cButtonWrapper.render(tempSurface)
-
-
         return tempSurface
 
-
+    """
+    Update the gamestate
+    """
     def update(self):
 
         return 0

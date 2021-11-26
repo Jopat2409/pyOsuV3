@@ -125,101 +125,132 @@ class gsBeatmapSelect:
             # set the previous mouse position
             self.prevMY = pygame.mouse.get_pos()[1]
 
+    """
+    Calculates the bounds of the buttons
+    NOTE should be changed when I create the UI system
+    """
     def calculateBmBounds(self):
-
-        self.bmOffset = math.ceil(config.SCREEN_RESOLUTION[0] / 60)
-        self.bmHeight = math.ceil(config.SCREEN_RESOLUTION[1] / 10)
-        self.bmWidth = config.SCREEN_RESOLUTION[0] / 3 + self.bmOffset
-        self.bmMargin = math.ceil(self.bmHeight / 10)
         
-        drawCount = 0
+        self.bmOffset = math.ceil(config.SCREEN_RESOLUTION[0] / 60)         # get the y offset of beatmaps
+        self.bmHeight = math.ceil(config.SCREEN_RESOLUTION[1] / 10)         # get the height of the beatmap
+        self.bmWidth = config.SCREEN_RESOLUTION[0] / 3 + self.bmOffset      # get the width of the beatmap
+        self.bmMargin = math.ceil(self.bmHeight / 10)                       # get the margin of the beatmap
+        
+        drawCount = 0                                                       # used for formatting purposes
+        # loops through all of the beatmaps
         for beatmap in self.beatmaps:
-
+            # calculates the bounds and appends them to the bounds array
             self.beatmapBounds.append((0,(self.bmMargin*(drawCount+1) + self.bmHeight*drawCount), self.bmWidth, self.bmHeight))
+            # increment the draw count
             drawCount += 1
-
-            
-        
-
+   
+    """
+    Runs when the mouse button is raised
+    """
     def mButtonUp(self):
 
+        # if the user is currently scrolling
         if self.scrolling:
+            # unpack the mouse position
             tempX, tempY = pygame.mouse.get_pos()
+            # idk what this does but it works
             mDiff = abs((tempX - self.prevMousePos[0])^2 + (tempY - self.prevMousePos[1])^2)
+            # if the difference in position is less that the minimum required (prevents accidentally scrolling rather than clicking)
             if mDiff <= self.maxMouseMovement^2:
-                print("PRESSED BUTTON")
                 self.scrolling = False
                 self.decelerating = False
                 self.velY = 0
 
+                # get the beatmap selected
                 self.getBeatmap(tempY)
                 return
+            # else stop scrolling, but do start decelerating
             self.scrolling = False
             self.decelerating = True
             try:
+                # slowly lower the velY
                 self.velY = math.ceil(self.velTotal / self.velCount)
             except ZeroDivisionError:
+                # in the case that self.velCount is 0, simply skip
                 pass
-            #print(self.velY)
 
-        
-
-
+    """
+    Ran when the user selects a beatmap
+    mY: y position of the mouse when the beatmap was selected
+    """
     def getBeatmap(self, mY):
+        # keep counter on how many beatmaps we have parsed
         bmCount = 0
-        print("getting beatmaps")
+
         for beatmap in self.beatmapBounds:
+            # get the y position of the beatmap
             bmOffset = beatmap[1] + self.offset
+            # if the mouse y position intersects
             if mY >= bmOffset and mY <= (bmOffset + self.bmHeight):
+                # if this beatmap is already selected
                 if self.cBeatmap == bmCount:
+                    # pause the gamestate with a new beatmapPlay gamestate
+                    # we pause here as the information currently in the class needs to be respored once the song has finished
                     self.parentClass.pauseGamestate(BeatmapPlay.gsBeatmapPlayer(self.beatmaps[self.cBeatmap], self.parentClass, False))
                 else:
+                    # set the current beatmap to the beatmap
                     self.cBeatmap = bmCount
+                    # preview the song the beatmap corresponds to 
                     self.soundHandler.previewSong(self.beatmaps[bmCount]["BasePath"]+"/"+self.beatmaps[bmCount]["AudioFilename"],int(self.beatmaps[bmCount]["PreviewTime"]))
+                    # create the path to the background image
                     PATH = os.path.join(self.beatmaps[bmCount]["BasePath"],self.beatmaps[bmCount]["BackgroundImage"])
+                    # fixes issues with permissions
                     PATH = PATH.replace("\\","/")
+                    # load the image
                     bg = pygame.image.load(PATH.strip())
+                    # blit it onto the background after scaling to screen size
                     self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
                 return
+            # increment the beatmap counter
             bmCount += 1
 
-
-            
-
-        
-
-
+    """
+    Updates the gamestate
+    """
     def update(self):
 
-
+        # if currently scrolling
         if self.scrolling:
+            # set the current velocity to the difference between the current mouse position and the last mouse position
             self.velY = pygame.mouse.get_pos()[1] - self.prevMY
+            # if the velocity is not 0
             if self.velY != 0:
+                # incrememnt the velocity counter (used for averaging velocity for deceleration)
                 self.velCount += 1
+                # increate the veltotal by the velocity (used for the same purpose)
                 self.velTotal += self.velY
+            # increment the current render offset of the beatmap container by the velocity
             self.offset += self.velY
+            # set the previous mouse y position to the current one
             self.prevMY = pygame.mouse.get_pos()[1]
         elif self.decelerating:
+            # increase the offset by the velocity
             self.offset += self.velY
+            # if still greater than 0
             if self.velY > 0:
+                # decrement the velocity by the deceleration
                 self.velY -= self.decel
+                # if the velocity has come to a rest, stop decelerating
                 if self.velY <= 0:
-                    self.decelerating = False
-            elif self.velY < 0:
-                self.velY += self.decel
-                if self.velY >= 0:
                     self.decelerating = False
 
                 
 
-
+    """
+    Render the beatmap rectangles
+    surface: surface for the beatmap bounding surface to be blitted to
+    NOTE need to update this method in proto2 
+    """
     def drawBeatmapRects(self, surface):
 
-        drawnbeatmaps = []
-        drawCount = 0
-
-        bmNumber = -1
+        bmNumber = -1                       # initialize the beatmap number to be -1
         for beatmap in self.beatmapBounds:
+            # incremembt the beatmap index
             bmNumber += 1
             # break out of for loop once all on screen beatmaps have been drawn
             if beatmap[1] + self.offset > config.SCREEN_RESOLUTION[1]:
@@ -230,18 +261,17 @@ class gsBeatmapSelect:
             # create the rectangle that will be drawn
             rectX = self.bmMargin
             
+            # the current beatmap will have a slightly lower x value so the user can tell
             if bmNumber != self.cBeatmap:
                 rectX += self.bmOffset
 
-
+            # create the rectangle used for the beatmap
             tempRect = (rectX, self.offset + beatmap[1], beatmap[2], beatmap[3])
+            # draw the rectangle onto the temporary surface
             pygame.draw.rect(surface, (0,255,0),tempRect)
-            try:
-                tempString = "{} [{}]".format(self.beatmaps[bmNumber]["Title"], self.beatmaps[bmNumber]["Version"])
-            except TypeError:
-                print(bmNumber)
-                print(self.beatmaps[bmNumber-1])
-                sys.exit(0)
+            # create text with the beatmap's name and difficulty
+            tempString = "{} [{}]".format(self.beatmaps[bmNumber]["Title"], self.beatmaps[bmNumber]["Version"])
+            # blit the text onto the rectangle
             surface.blit(self.font.render(tempString, True, (0,0,0)), (rectX, int(beatmap[1]+self.offset)))
         
     """
