@@ -4,7 +4,6 @@ import BeatmapParse
 import BeatmapFrame
 import AiPlayer
 import SkinLoader
-import UiElements
 """ ---------- PYTHON MODULES ---------- """
 import pygame
 import pygame.gfxdraw
@@ -92,15 +91,6 @@ class gsBeatmapPlayer:
         # plays the song and begins the beatmap
         self.soundHandler.playSong(self.playingBeatmap["BasePath"]+"/"+self.playingBeatmap["AudioFilename"])
 
-    """
-    method for setting up the UI for the gamestate
-    """
-    def setupUI(self):
-        # create the "pauseMenu" group
-        self.parent.uiManager.createGroup("PauseMenu", shownOnCreation=False)
-        # add the pause button to the group
-        self.parent.uiManager.addElement(UiElements.Image(os.path.join(SkinLoader.currentSkinDirectory, "Pause-continue@2x.png"), pygame.Rect(200,200,300,100), flags=["CLICKABLE"]), group="PauseMenu")
-    
     """
     Method for loading the image assets needed for the gamestate
     """

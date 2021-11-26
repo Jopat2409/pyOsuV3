@@ -1,8 +1,9 @@
 """ ---------- OSU MODULES ---------- """
-from time import time
-""" ---------- PYTHON MODULES ---------- """
 import osrparse
 import config
+""" ---------- PYTHON MODULES ---------- """
+from time import time
+
 
 
 """
@@ -32,18 +33,28 @@ class ArtificialIntelligence:
         self.getMouseEvents()
         # set ready to true
         self.isReady = True
-
+    
+    """
+    Gets the cursor position of the replay at the time specified
+    timePos: current time positon
+    verbose: wether or not to print results (for debugging purposes)
+    """
     def getCursorPos(self, timePos, verbose=False):
 
         if verbose:
                 print(f"Current time is {timePos}, first mouse data time is {self.mouseData[0]}")
 
+        # loop through mouse data
         for i in range(len(self.mouseData)):
+            # get the current mouse data
             mousePos = self.mouseData[i]
-            
+            # if the time_delta of the mouse state matches the time position exactly (unlikely)
             if mousePos.time_delta == timePos:
+                # simply return the x and y coordinate
                 return [mousePos.x, mousePos.y]
+            # else if the time_delta is between two mouse states
             elif mousePos.time_delta > timePos:
+                # return the result of the interpolation between position i-1 and i
                 return self.interpolatePosition(i-1, i, timePos, verbose)
 
     """
