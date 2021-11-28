@@ -2,7 +2,6 @@
 import MainMenu                             # for creating the initial gamestate
 import config                               # for accessing program-global variables
 import SoundHandler                         # for handling sound
-import SkinLoader                           # for loading assets
 
 """ ---------- PYTHON MODULES ---------- """
 import queue                                # for implementing the gamestate stack
@@ -133,10 +132,9 @@ class gameStateManager:
         
         # render the cursor at the current mouse position
         mX, mY = pygame.mouse.get_pos() # get the position of the cursor
-        mX -= self.cursorSize / 2       # factor in the cursor radius
-        mY -= self.cursorSize / 2       # ""
-        # blit the cursor to the x and y calculated 
-        self.window.blit(SkinLoader.imageMap["cursor"], (mX, mY))
+        
+        pygame.gfxdraw.filled_circle(self.window, mX, mY, 50, (255,255,0))
+
         # update the display
         pygame.display.update()
 

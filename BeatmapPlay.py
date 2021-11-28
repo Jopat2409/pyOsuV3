@@ -3,7 +3,6 @@ import config
 import BeatmapParse
 import BeatmapFrame
 import AiPlayer
-import SkinLoader
 """ ---------- PYTHON MODULES ---------- """
 import pygame
 import pygame.gfxdraw
@@ -40,8 +39,6 @@ class gsBeatmapPlayer:
         # initialize the isMulti bool
         self.isMulti = multi
         
-        # load all necessary images needed for rendering
-        self.loadAssets()
         # calculate all necessary values for the map, such as relative circle size, approach rate in ms etc
         self.getMapValues()
 
@@ -89,13 +86,6 @@ class gsBeatmapPlayer:
         # plays the song and begins the beatmap
         self.soundHandler.playSong(self.playingBeatmap["BasePath"]+"/"+self.playingBeatmap["AudioFilename"])
 
-    """
-    Method for loading the image assets needed for the gamestate
-    """
-    def loadAssets(self):
-        
-        # load the beatmao images
-        SkinLoader.loadBeatmapImages()
 
     """ 
     Function called when a successful circle press is registererd
@@ -173,8 +163,6 @@ class gsBeatmapPlayer:
         BeatmapFrame.circleSize = int(config.CURRENT_SCALING*(54.4-4.48*float(self.playingBeatmap["CircleSize"])))
         BeatmapFrame.approachCircleSize = BeatmapFrame.circleSize*2
 
-        SkinLoader.beatmapMap.update({"hitCircle":pygame.transform.scale(SkinLoader.beatmapMap["hitCircle"], (BeatmapFrame.approachCircleSize, BeatmapFrame.approachCircleSize))})
-        SkinLoader.beatmapMap.update({"hitCircleOverlay":pygame.transform.scale(SkinLoader.beatmapMap["hitCircleOverlay"], (BeatmapFrame.approachCircleSize, BeatmapFrame.approachCircleSize))})
         # calculate the respective windows for scores, using the map's overall difficulty value
         self.hitWindows = [((400-20*float(self.playingBeatmap["OverallDifficulty"]))/2)*10,
                            ((280-16*float(self.playingBeatmap["OverallDifficulty"]))/2)*10,
@@ -281,8 +269,6 @@ class gsBeatmapPlayer:
 
         # fill the surface with black
         tempSurface.fill((0,0,0))
-        # add the overlay
-        tempSurface.blit(SkinLoader.stateMap["playOverlay"], (0,0))
         # initialize the combo
         combo = 0
         # get the current song position
@@ -345,7 +331,7 @@ class gsBeatmapPlayer:
     """
     def drawPauseMenu(self, surface):
         # blit the pause overlay image onto the screen
-        surface.blit(SkinLoader.stateMap["pauseOverlay"], (0,0))
+        pass
 
     """
     Check if the mouse is within the current hitcircle

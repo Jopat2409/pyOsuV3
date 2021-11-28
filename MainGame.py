@@ -1,7 +1,6 @@
 """ ---------- OSU MODULES ---------- """
 import GameState                            # for handling different gamestates
 import config                               # for program global variables
-import SkinLoader                           # for loading assets
 
 """ ---------- PYTHON MODULES ---------- """
 import time                                 # for perf_counter()
@@ -30,9 +29,6 @@ class osuGame():
         # initializes the external frame and update per second counters
         self.frames = 0
         self.updates = 0
-
-        # loads all necessary assets
-        SkinLoader.loadImageMaps()
         
 
         # starts the game loop

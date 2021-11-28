@@ -2,7 +2,6 @@
 import config                               # for program-global variables
 import BeatmapParse                         # for parsing beatmaps
 import BeatmapPlay                          # for playing beatmaps
-import SkinLoader                           # for loading assets
 """ ---------- PYTHON MODULES ---------- """
 import random                               # for initializing song choice
 import pickle                               # for serializing beatmaps
@@ -67,8 +66,6 @@ class gsBeatmapSelect:
         # intialize the default font
         self.font = pygame.font.SysFont('Arial', 25)
 
-        # load the assets for the beatmap select gamestate        
-        SkinLoader.loadBeatmapSelectImages()
         # initialize the timer for timing how long it takes to load beatmaps
         bmLoadStart = time.time()
         # checks for beatmap cache
@@ -297,5 +294,3 @@ class gsBeatmapSelect:
         # blit the beatmap frame onto the main surface
         tempSurface.blit(beatmapFrame, ((config.SCREEN_RESOLUTION[0] / 3)*2,0))
 
-        # blit the beatmap selection overlay
-        tempSurface.blit(SkinLoader.stateMap["selectOverlay"], (0,0))

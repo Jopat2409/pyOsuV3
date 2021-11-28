@@ -1,7 +1,6 @@
 """ ---------- OSU MODULES ---------- """
 import config                               # for program-global variables
 import BeatmapFrame                         # for getting the current beatmap information
-import SkinLoader                           # for rendering hit objects
 """ ---------- PYTHON MODULES ---------- """
 import pygame                               # for rendering
 import pygame.gfxdraw                       # for anti-aliased rendering
@@ -29,10 +28,8 @@ class hitCircle:
         
     def render(self, cPos, surface):
 
-        # blit the hit circle image to the position
-        surface.blit(SkinLoader.beatmapMap["hitCircle"], (self.x - BeatmapFrame.circleSize, self.y - BeatmapFrame.circleSize))
-        # blit the hit circle overlay image to the position
-        surface.blit(SkinLoader.beatmapMap["hitCircleOverlay"], (self.x - BeatmapFrame.circleSize, self.y - BeatmapFrame.circleSize))
+        pygame.gfxdraw.filled_circle(surface, self.x, self.y, BeatmapFrame.circleSize, (255,255,255))
+        pygame.gfxdraw.filled_circle(surface, self.x, self.y, int(BeatmapFrame.circleSize*0.9), BeatmapFrame.currentComboColor)
         # interpolate the amount of time through the hit window the current time is, to work out the radius of the approach circle
         aOffset = int(BeatmapFrame.circleSize + BeatmapFrame.approachCircleSize * ((self.timingPoint-cPos) / BeatmapFrame.fadeInStart))
         for i in range(5):
