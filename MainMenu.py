@@ -72,6 +72,9 @@ class MainButton:
             pygame.gfxdraw.filled_circle(surface, self.pos[0], self.pos[1], self.radius, config.WHITE)
             # draw the pink interior
             pygame.gfxdraw.filled_circle(surface, self.pos[0], self.pos[1], self.rRadius, config.PINK)
+            text_rect = config.titleFont.get_rect("OSU!ai", size = int(65*config.CURRENT_SCALING))
+            text_rect.center = surface.get_rect().center 
+            config.titleFont.render_to(surface, text_rect, "OSU!ai", (255,255,255), size=int(65*config.CURRENT_SCALING))
         else:
             for i in range(3):
                 # render the three buttons

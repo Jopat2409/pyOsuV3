@@ -10,6 +10,7 @@ import sys                                  # for exiting program
 import glob                                 # for finding cfg file 
 from shutil import copyfile                 # for copying cfg file
 
+
 """
 This class is for the initialization of the game, setting default variables settings
 Since it is only ever called once there is no point in having it be a gamestate
@@ -97,7 +98,16 @@ def startGame():
     # load all the user's default settings from the osu!.cfg
     loadSettings()
     # store the working skin directory
-    config.cSkinDirectory = skinFolder = os.path.join(config.DEFAULT_PATH, "skins", config.currentSettings["Skin"])
+    config.cSkinDirectory = os.path.join(config.DEFAULT_PATH, "skins", config.currentSettings["Skin"])
+    config.cAssetDirectory = os.path.join(config.DEFAULT_PATH, "assets")
+    try:
+        import pygame.freetype
+        if not pygame.freetype.get_init():
+            pygame.freetype.init()
+    except ModuleNotFoundError:
+        print("You do not have the correct pygame modules.... Closing program")
+    config.titleFont = pygame.freetype.Font(os.path.join(config.cAssetDirectory, "font/AllerDisplay.ttf"))
+    config.mainFont = pygame.freetype.Font(os.path.join(config.cAssetDirectory, "font/Aller_Rg.ttf"))
     
     
     
