@@ -25,7 +25,7 @@ class osuGame():
         # initializes the class used for managing the current game state
         self.gsManager = GameState.gameStateManager()
         # set's the game's running state to TRUE
-        self.running = True
+        config.isRunning = True
         # initializes the external frame and update per second counters
         self.frames = 0
         self.updates = 0
@@ -52,7 +52,7 @@ class osuGame():
         pTime = time.perf_counter()
 
         # loop while running is true
-        while(self.running):
+        while(config.isRunning):
             # if one second has elapsed since the last time this block of code was ran
             if time.perf_counter() - pTime >= 1:
                 # update the viewable frames and updates counter
@@ -95,7 +95,7 @@ class osuGame():
         for event in pygame.event.get():
             # close game if x is pressed
             if event.type == pygame.QUIT:
-                self.running = False
+                config.isRunning = False
             elif event.type == pygame.KEYUP:
                 # attempts to map the key pressed to the correct function via the instance variable keyBindings
                 try:

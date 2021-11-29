@@ -133,7 +133,7 @@ class gameStateManager:
         # render the cursor at the current mouse position
         mX, mY = pygame.mouse.get_pos() # get the position of the cursor
         
-        pygame.gfxdraw.filled_circle(self.window, mX, mY, 50, (255,255,0))
+        pygame.gfxdraw.filled_circle(self.window, mX, mY, 20, (255,255,0))
 
         # update the display
         pygame.display.update()

@@ -23,6 +23,7 @@ class audioStream:
 
         # set the music volume to the volume saved in the config
         self.musicChannel.set_volume(0.1)
+        self.effectChannel.set_volume(0.3)
 
     """
     Plays a defined sound effect

@@ -107,7 +107,6 @@ def startGame():
     except ModuleNotFoundError:
         print("You do not have the correct pygame modules.... Closing program")
     config.titleFont = pygame.freetype.Font(os.path.join(config.cAssetDirectory, "font/AllerDisplay.ttf"))
-    config.mainFont = pygame.freetype.Font(os.path.join(config.cAssetDirectory, "font/Aller_Rg.ttf"))
     
     
     

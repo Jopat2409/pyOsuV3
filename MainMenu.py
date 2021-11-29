@@ -45,46 +45,56 @@ class MainButton:
         # tracks wether or not the center button has been pressed
         self.active = False
 
-
+    """
+    Changes gamestate
+    """
     def optionPlay(self):
-        #print("Playing")
-        # switch to the next gamestate
+        # switch to the beatmap selection gamestate
         self.parentClass.newGamestate(BeatmapSelect.gsBeatmapSelect(self.parentClass))
-
+    """
+    Changes gamestate
+    """
     def optionAI(self):
-        # sets the gamestate to the ai gamestate
+        # sets the gamestate to the ai interface gamestate
         self.parentClass.newGamestate(AiGamestate.gsNeuralNetworkTrain(self.parentClass))
-    
-    def defunctFunct(self):
-        pass
-    
+        
+    """
+    Exits the whole program
+    """
     def exit(self):
         # exit out of the game
-        pygame.display.quit()
-        pygame.quit()
-        # exit out of the program
-        sys.exit(0)
-    
+        config.isRunning = False
+
+    """
+    Renders the button onto the gamestate
+    """
     def render(self, surface):
         # render the main osu button depending on wether or not it is active
         if not self.active:
-            # draw the white outline
+            # draw the white outline around the circle
             pygame.gfxdraw.filled_circle(surface, self.pos[0], self.pos[1], self.radius, config.WHITE)
             # draw the pink interior
             pygame.gfxdraw.filled_circle(surface, self.pos[0], self.pos[1], self.rRadius, config.PINK)
+            # create a rect for the main title text
             text_rect = config.titleFont.get_rect("OSU!ai", size = int(65*config.CURRENT_SCALING))
-            text_rect.center = surface.get_rect().center 
+            # center the text on the main screen
+            text_rect.center = surface.get_rect().center
+            # draw the text to the screen
             config.titleFont.render_to(surface, text_rect, "OSU!ai", (255,255,255), size=int(65*config.CURRENT_SCALING))
         else:
+            # draw the three buttons
             for i in range(3):
                 # create the rect
                 bgRect = pygame.Rect(self.bX, (self.bY + (self.bHeight+self.bMargin)*i), self.bWidth, self.bHeight)
-                # render the three buttons
+                # draw the rectangle
                 pygame.draw.rect(surface, config.BLUE, bgRect)
-                text_rect = config.mainFont.get_rect(self.buttons[i], size=int(20*config.CURRENT_SCALING))
+                # create a rect for the button text
+                text_rect = config.titleFont.get_rect(self.buttons[i], size=int(20*config.CURRENT_SCALING))
+                #center the text within the button
                 text_rect.center = bgRect.center
-                config.mainFont.render_to(surface, text_rect, self.buttons[i], (255,255,255), size=int(20*config.CURRENT_SCALING))
-            # draw the osu button at an offset
+                # draw the text to the main screen
+                config.titleFont.render_to(surface, text_rect, self.buttons[i], (255,255,255), size=int(20*config.CURRENT_SCALING))
+            # render the main osu button at an offset
             pygame.gfxdraw.filled_circle(surface, self.pos[0] - 300, self.pos[1], self.radius, config.WHITE)
             pygame.gfxdraw.filled_circle(surface, self.pos[0] - 300, self.pos[1], self.rRadius, config.PINK)
 
