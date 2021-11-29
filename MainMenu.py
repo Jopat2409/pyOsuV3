@@ -77,8 +77,13 @@ class MainButton:
             config.titleFont.render_to(surface, text_rect, "OSU!ai", (255,255,255), size=int(65*config.CURRENT_SCALING))
         else:
             for i in range(3):
+                # create the rect
+                bgRect = pygame.Rect(self.bX, (self.bY + (self.bHeight+self.bMargin)*i), self.bWidth, self.bHeight)
                 # render the three buttons
-                pygame.draw.rect(surface, config.BLUE, (self.bX, (self.bY + (self.bHeight+self.bMargin)*i), self.bWidth, self.bHeight))
+                pygame.draw.rect(surface, config.BLUE, bgRect)
+                text_rect = config.mainFont.get_rect(self.buttons[i], size=int(20*config.CURRENT_SCALING))
+                text_rect.center = bgRect.center
+                config.mainFont.render_to(surface, text_rect, self.buttons[i], (255,255,255), size=int(20*config.CURRENT_SCALING))
             # draw the osu button at an offset
             pygame.gfxdraw.filled_circle(surface, self.pos[0] - 300, self.pos[1], self.radius, config.WHITE)
             pygame.gfxdraw.filled_circle(surface, self.pos[0] - 300, self.pos[1], self.rRadius, config.PINK)
