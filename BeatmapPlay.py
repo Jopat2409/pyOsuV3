@@ -51,11 +51,16 @@ class gsBeatmapPlayer:
 
         # initialize the font used throught the map
         self.cFont = pygame.font.SysFont('Arial', 40)
+        
 
         # mapping all key presses to their respective functions
         self.KEY_MAP = {"keyOsuLeft":self.hasHitNextNote,
                                "keyOsuRight":self.hasHitNextNote,
                                "keyPause":self.pauseMap}
+        # remove the key bindings if relax is on
+        if "RX" in config.currentMods:
+            del self.KEY_MAP["keyOsuRight"],self.KEY_MAP["keyOsuLeft"]
+            self.isRxReading = False
         # mapping the buttons to their respective button functions
         self.buttonFunct = [self.pauseMap, self.retry, self.parent.resumeGamestate]
 
@@ -69,6 +74,10 @@ class gsBeatmapPlayer:
         self.missCount = 0
         # holds the value of the current score
         self.score = 0
+        # holds the max possible scores
+        self.totalHit = 0
+        # holds the users hit scores
+        self.userHit = 0
         
         # create the hit-timing array
         self.hitTimings = []
@@ -85,12 +94,17 @@ class gsBeatmapPlayer:
         
         # plays the song and begins the beatmap
         self.soundHandler.playSong(self.playingBeatmap["BasePath"]+"/"+self.playingBeatmap["AudioFilename"])
-
+    
 
     """ 
     Function called when a successful circle press is registererd
     """
     def hitNote(self, score):
+
+        self.totalHit += 300
+        self.userHit += score
+        # play the hitsound
+        self.soundHandler.playEffect("hitSound")
         # increment the player's current combo
         self.combo += 1
         # if the current combo is larger than the max combo, update the max combo
@@ -104,6 +118,7 @@ class gsBeatmapPlayer:
     Function called when a missed note is registered
     """
     def missNote(self):
+        self.totalHit+=300
         # increment the miss count
         self.missCount += 1
         # reset the player combo
@@ -303,11 +318,15 @@ class gsBeatmapPlayer:
     """
     def drawInfoUI(self, surface):
         # render the current user combo
-        comboText = self.cFont.render("{}x".format(self.combo), True, (255,255,255))
+        comboText = self.cFont.render(f"{self.combo}x", True, (255,255,255))
+        userHitPercent = 100 if self.totalHit==0 else (self.userHit/self.totalHit)*100
+        percentageText = self.cFont.render(f"{userHitPercent:.2f}%", True, (255,255,255))
         # work out the margin of the combo
         comboMargin = int(config.SCREEN_RESOLUTION[0]*(1/20))
+        percentageTextMargin = 2*comboMargin
         # blit the combo onto the main screen
         surface.blit(comboText, (comboMargin, config.SCREEN_RESOLUTION[1] - comboMargin))
+        surface.blit(percentageText, (percentageTextMargin, config.SCREEN_RESOLUTION[1]-comboMargin))
 
     """
     Draw the unstable rate indicator
@@ -413,14 +432,21 @@ class gsBeatmapPlayer:
     Update the gamestate
     """
     def update(self):
+        cPos = self.getCurrentPos()
         try:
             # if the first hit object has alreayd passed
-            if self.hitObjects[0].timingPoint < self.getCurrentPos():
+            if self.hitObjects[0].timingPoint + 10 < cPos:
                 # miss the note
                 self.missNote()
-                # play hitsound (debug purposes)
-                self.soundHandler.playEffect("hitSound")
-        except IndexError:
+            elif "RX" in config.currentMods and cPos+BeatmapFrame.fadeInStart >= self.hitObjects[0].timingPoint:
+                if self.checkCircle():
+                    self.isRxReading = True
+                if self.isRxReading:
+                    if not self.checkCircle() or cPos >= self.hitObjects[0].timingPoint:
+                        self.hitNote(300)
+                        self.isRxReading = False
+
+        except IndexError as e:
             pass
         # idk why this is here?
         if not self.soundHandler.musicChannel.get_busy() and not self.isPaused:

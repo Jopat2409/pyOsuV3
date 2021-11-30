@@ -11,7 +11,7 @@ safeMode = False
 
 useOsuTextures = True
 
-currentMods = []
+currentMods = ["RX"]
 
 
 

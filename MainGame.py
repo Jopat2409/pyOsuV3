@@ -68,11 +68,10 @@ class osuGame():
             elapsedTime = cTime - prevTime
             prevTime = cTime
             lag += elapsedTime
-            
+            # handles inputs as many times per second as possible
+            self.handleInput()
             # loop to ensure that the game updates at the correct tick rate as defined by MS_PER_UPDATE
             while lag >= self.MS_PER_UPDATE:
-                # handles inputs as many times per second as possible
-                self.handleInput()
                 # update the gamestate manager
                 self.gsManager.update()
                 # update the lag
