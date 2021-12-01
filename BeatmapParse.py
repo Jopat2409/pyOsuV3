@@ -74,7 +74,8 @@ def fullParse(beatmapPath):
     cSection = ""           # initializes the current section
     combo = 0               # initializes the current combo
 
-    hitObjects = []         # initializes the hitObjects array
+    hitObjects = {"renderObject":[],"timingObject":[]}
+    sliderObjects = []
 
     # open the beatmap file with utf-8 encoding 
     with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:
@@ -109,11 +110,16 @@ def fullParse(beatmapPath):
                         # add the index to the object parameters
                         objectParams.append(i)
                 if 0 in objectParams:                                   # 0 denotes a hit circle object
-                    hitObjects.append(HitObject.hitCircle(tempObj))
+                    hitObjects["renderObject"].append([config.xOffset + int(config.CURRENT_SCALING * int(tempObj[0])), 
+                                                       config.xOffset + int(config.CURRENT_SCALING * int(tempObj[0])),
+                                                       0])
                 elif 1 in objectParams:                                 # 1 denotes a slider object
-                    hitObjects.append(HitObject.slider(tempObj))
+                    hitObjects["renderObject"].append([config.xOffset + int(config.CURRENT_SCALING * int(tempObj[0])), 
+                                                       config.xOffset + int(config.CURRENT_SCALING * int(tempObj[0])),
+                                                       0])
                 elif 3 in objectParams:                                 # 3 denotes a spinner object
                     hitObjects.append(HitObject.spinner(tempObj))
+                hitObjects["timingObject"].append(int(tempObj[2]))
     # return the hit objects array
     return hitObjects
 

@@ -3,6 +3,7 @@ import config
 import BeatmapParse
 import BeatmapFrame
 import AiPlayer
+import OsuRuleset
 """ ---------- PYTHON MODULES ---------- """
 import pygame
 import pygame.gfxdraw
@@ -20,69 +21,35 @@ class gsBeatmapPlayer:
 
 
     def __init__(self, PATH, parentClass, multi=False):
-        # create the temporary path
-        self.tempPath = PATH
+
         # pointer to the parent class
         self.parent = parentClass
         # pointer to the sound handler used for playing music etc
         self.soundHandler = parentClass.soundStream
-        # load the data from the beatmap file which will be used to display and run the map
+        
         self.playingBeatmap = PATH
 
-        # parse the full beatmap
-        self.hitObjects = BeatmapParse.fullParse(self.playingBeatmap["osuPath"])
-
-        # initialize the offset time used for correct pausing and resuming
-        self.pausedTime = 0
-        self.offsetTime = 0
-
-        # initialize the isMulti bool
         self.isMulti = multi
-        
-        # calculate all necessary values for the map, such as relative circle size, approach rate in ms etc
-        self.getMapValues()
 
-        # load and display the background image assigned to the map
-        PATH = os.path.join(self.playingBeatmap["BasePath"],self.playingBeatmap["BackgroundImage"])
-        PATH = PATH.replace("\\","/")
-        bg = pygame.image.load(PATH.strip()).convert()
-        # transform the image to the size of the screen currently
-        self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
+        self.loadAssets()
 
-        # initialize the font used throught the map
-        self.cFont = pygame.font.SysFont('Arial', 40)
-        
+        self.getParsedBeatmap(self.playingBeatmap["osuPath"])
 
         # mapping all key presses to their respective functions
         self.KEY_MAP = {"keyOsuLeft":self.hasHitNextNote,
                                "keyOsuRight":self.hasHitNextNote,
                                "keyPause":self.pauseMap}
-        # remove the key bindings if relax is on
-        if "RX" in config.currentMods:
-            del self.KEY_MAP["keyOsuRight"],self.KEY_MAP["keyOsuLeft"]
-            self.isRxReading = False
         # mapping the buttons to their respective button functions
         self.buttonFunct = [self.pauseMap, self.retry, self.parent.resumeGamestate]
 
-        
+        # update values to account for current modifiers
+        self.updateForMods()
+        # initialize all of the variables
+        self.initializeClassValues()
 
-        # holds the value of the current combo held by the player
-        self.combo = 0
-        # holds the value of the maximum combo achieved by the player
-        self.maxCombo = 0
-        # holds the value of the number of misses held by the player
-        self.missCount = 0
-        # holds the value of the current score
-        self.score = 0
-        # holds the max possible scores
-        self.totalHit = 0
-        # holds the users hit scores
-        self.userHit = 0
         
-        # create the hit-timing array
-        self.hitTimings = []
-        # holds wether or not the map is paused
-        self.isPaused = False
+        
+        
 
         # if multiplayer is enabled
         if self.isMulti:
@@ -94,13 +61,89 @@ class gsBeatmapPlayer:
         
         # plays the song and begins the beatmap
         self.soundHandler.playSong(self.playingBeatmap["BasePath"]+"/"+self.playingBeatmap["AudioFilename"])
-    
+
+
+    def loadAssets(self):
+        # load and display the background image assigned to the map
+        PATH = os.path.join(self.playingBeatmap["BasePath"],self.playingBeatmap["BackgroundImage"])
+        PATH = PATH.replace("\\","/")
+        bg = pygame.image.load(PATH.strip()).convert()
+        # transform the image to the size of the screen currently
+        self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
+
+        # initialize the font used throught the map
+        self.cFont = pygame.font.SysFont('Arial', 40)
+
+
+    def getParsedBeatmap(self, beatmapPath):
+
+        tempHitObjects = BeatmapParse.fullParse(beatmapPath)
+
+        self._renderObjects = tempHitObjects["renderObject"]
+        self._timingObjects = tempHitObjects["timingObject"]
+
+        if len(self._renderObjects) != len(self._timingObjects):
+            raise Exception
+
+
+    """
+    Update values to account for mods
+    """
+    def updateForMods(self):
+
+        hRMult = 1.0
+        csMult = 1.0
+        odMult = 1.0
+        
+        for mod in config.currentMods:
+            # remove the key bindings if relax is on
+            if mod == "RX":
+                del self.KEY_MAP["keyOsuRight"],self.KEY_MAP["keyOsuLeft"]
+                self.isRxReading = False
+            elif mod == "HR":
+                hRMult * 1.4
+                csMult * 1.3
+                odMult * 1.4
+            elif mod == "EZ":
+                hRMult * 0.5
+                csMult * 0.5
+                odMult * 0.5
+        
+        self.playingBeatmap["ArrproachRate"]        = float(self.playingBeatmap["ApproachRate"])*hRMult
+        self.playingBeatmap["CirleSize"]            = float(self.playingBeatmap["CircleSize"])*csMult
+        self.playingBeatmap["OverallDifficulty"]    = float(self.playingBeatmap["OverallDifficulty"])*odMult
+
+    def initializeClassValues(self):
+        # initialize the offset time used for correct pausing and resuming
+        self.pausedTime = 0
+        self.offsetTime = 0
+        self.cIndex = 0
+
+        """ ------------ INITIALIZING SCORE VARIABLES ---------------- """
+        self.combo = 0                              # holds the value of the current combo held by the player
+        self.maxCombo = 0                           # holds the value of the maximum combo achieved by the player
+        self.score = 0                              # holds the value of the current score
+        self.totalHit = 0                           # holds the max possible scores
+        self.userHit = 0                            # holds the users hit scores
+        self.scoreCount = {0:0,50:0,100:0,300:0}    # holds the count of specific scores the user has hit# create the hit-timing array
+        self.hitTimings = []                        # holds the previous hit errors from the user
+        """ ---------------------------------------------------------- """
+
+        # holds wether or not the map is paused
+        self.isPaused = False
+        # calculate all necessary values for the map, such as relative circle size, approach rate in ms etc
+        self.getMapValues()
+
+    def removeNextHitObject(self):
+
+        self._timingObjects.pop(0)
+        self._renderObjects.pop(0)
 
     """ 
     Function called when a successful circle press is registererd
     """
     def hitNote(self, score):
-
+        self.scoreCount[score] += 1
         self.totalHit += 300
         self.userHit += score
         # play the hitsound
@@ -112,19 +155,20 @@ class gsBeatmapPlayer:
             self.maxCombo = self.combo
         # add to the user's current score the current combo multiplied by the hit score achieved (300, 100, 50)
         self.score += self.combo*score
-        self.hitObjects.pop(0)
+        self.removeNextHitObject()
 
     """ 
     Function called when a missed note is registered
     """
     def missNote(self):
+
+        self.scoreCount[0] += 1
+        # update the total 300s
         self.totalHit+=300
-        # increment the miss count
-        self.missCount += 1
         # reset the player combo
         self.combo = 0
         # remove the current hit object that was missed
-        self.hitObjects.pop(0)
+        self.removeNextHitObject()
 
     """
     Get the current position of the music channel
@@ -154,49 +198,34 @@ class gsBeatmapPlayer:
             self.soundHandler.resumeSong(self.pausedTime)
 
 
-        
+    def getCurrentIndex(self, cPos):
+
+        for i,_obj in enumerate(self._timingObjects):
+            # if beatmap cannot be seen
+            if cPos < _obj - self.fadeInStartOffset:
+                return i 
 
     """ 
     Function that calculates all the necessary values used in the playing of the beatmap
     """
     def getMapValues(self):
 
-        # calculate the AR timings
-        """ If the approach rate is less than 5, the formula to work it out is 800+400*(5-approach rate)/5"""
-        if float(self.playingBeatmap["ApproachRate"]) < 5:
-            self.fadeInTime = int(800 + 400*((5-float(self.playingBeatmap["ApproachRate"])) / 5))
-            BeatmapFrame.fadeInStart = int(1200 + 600*((5-float(self.playingBeatmap["ApproachRate"])) / 5))
-        elif float(self.playingBeatmap["ApproachRate"]) == 5:
-            """ If the approach rate is 5, the formula is just 800"""
-            self.fadeInTime = 800
-            BeatmapFrame.fadeInStart = 1200
-        elif float(self.playingBeatmap["ApproachRate"]) > 5:
-            """ If the approach rate is greater than 5, the formula is 800-500*(appraoch rate - 5) / 5"""
-            self.fadeInTime = int(800 - 500*((float(self.playingBeatmap["ApproachRate"])-5)/5))
-            BeatmapFrame.fadeInStart = int(1200 - 750*((float(self.playingBeatmap["ApproachRate"])-5)/5))
-        # calculate the outer radius of the circle based on the current circle size
-        BeatmapFrame.circleSize = int(config.CURRENT_SCALING*(54.4-4.48*float(self.playingBeatmap["CircleSize"])))
-        BeatmapFrame.approachCircleSize = BeatmapFrame.circleSize*2
+        """ ------------- initialize map difficulty values ---------------- """
 
-        # calculate the respective windows for scores, using the map's overall difficulty value
-        self.hitWindows = [((400-20*float(self.playingBeatmap["OverallDifficulty"]))/2)*10,
-                           ((280-16*float(self.playingBeatmap["OverallDifficulty"]))/2)*10,
-                           ((160-12*float(self.playingBeatmap["OverallDifficulty"]))/2)*10]
+        self.fadeInStartOffset,self.fadeInTime = OsuRuleset.getAR(self.playingBeatmap["ApproachRate"])
+        self.cirleRadius = OsuRuleset.getCS(self.playingBeatmap["CircleSize"])
+        self.aCircleRadius = self.cirleRadius*2
+        self.hitWindows = OsuRuleset.getHitWindows(self.playingBeatmap["OverallDifficulty"])
+
+
+        """ ----------------------------------------------------------------"""
         
-        # storing the scores for the respective hit windows
-        self.scoreWindows = [50,100,300]
+        
 
         # calculate values related to the hit timing display
         self.rectSize = int(config.SCREEN_RESOLUTION[0] / 3)
         self.timingColors = [(255,0,0),(0,255,0),(0,0,255)]
         #print(self.hitWindows)
-
-        self.xOffset = int((config.SCREEN_RESOLUTION[0] - config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING)/2)
-
-        #print("X offset: {}".format(self.xOffset))
-
-        # ms before the hit window begins in which a player misses if they try to hit the circle
-        self.missMargin = 50
         self.calcButtonBounds()
 
     """
@@ -244,38 +273,6 @@ class gsBeatmapPlayer:
         # update button bounds
         self.buttonBounds = [(yVal, height+(height+margin)*i, width, height) for i in range(3)]
 
-    """
-    Draw the follow points between the hit circles
-    """
-    def drawFollowPoints(self, surface):
-        
-        # current follow point index
-        followPointIndex = 0
-        # get the current time position
-        cTimePos = self.getCurrentPos()
-        # loop through the hit objects
-        for i in range(len(self.hitObjects)):
-            # skip the first hit object
-            if i == 0:
-                continue
-            # get the last hit object
-            pObject = self.hitObjects[i-1]
-            # get the current hit object
-            cObject = self.hitObjects[i]
-            # if a hit objects should be drawn
-            if cTimePos + self.fadeInStart >= pObject[2]:
-                
-                # first position
-                cPos = (cObject[0]+self.xOffset, cObject[1])
-                # current time
-                cTime = cObject[2]
-                # second position
-                pPos = (pObject[0]+self.xOffset, pObject[1])
-                # draw line between the notes
-                pygame.draw.aaline(surface, (255,255,255), cPos, pPos)
-                #pTime = 
-            else:
-                break
 
     """
     Render the gamestate
@@ -432,22 +429,17 @@ class gsBeatmapPlayer:
     Update the gamestate
     """
     def update(self):
+        # get the current position in time
         cPos = self.getCurrentPos()
-        try:
-            # if the first hit object has alreayd passed
-            if self.hitObjects[0].timingPoint + 10 < cPos:
-                # miss the note
+        # get the current last hit object that will be rendered
+        self.cIndex = self.getCurrentIndex(cPos)
+        # loop through renderable hit objects
+        for i,timingObject in enumerate(self._timingObjects[::self.cIndex]):
+            # if current position is greater than the position of the hit object plus the 100 hit window
+            if timingObject + self.hitWindows[1] < cPos:
                 self.missNote()
-            elif "RX" in config.currentMods and cPos+BeatmapFrame.fadeInStart >= self.hitObjects[0].timingPoint:
-                if self.checkCircle():
-                    self.isRxReading = True
-                if self.isRxReading:
-                    if not self.checkCircle() or cPos >= self.hitObjects[0].timingPoint:
-                        self.hitNote(300)
-                        self.isRxReading = False
-
-        except IndexError as e:
-            pass
+            else:
+                self._renderObjects[i]
         # idk why this is here?
         if not self.soundHandler.musicChannel.get_busy() and not self.isPaused:
             self.parent.resumeGamestate()
