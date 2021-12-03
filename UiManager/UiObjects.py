@@ -1,15 +1,15 @@
-
 import pygame
-
-class Image:
-
-    def __init__(self, imagePath, x, y, function=None):
-        
-        self.dataObjects = {"UI_RENDER":[pygame.image.load(imagePath).convert(),(x,y)]}
-        if function:
-            self.dataObjects.update({"UI_FUNCPRESS":[self.dataObjects["UI_RENDER"][0].get_rect(),function]})
+from enum import IntEnum,unique
 
 
-    def getData(self):
 
-        return self.dataObjects
+
+@unique
+class FLAGS(IntEnum):
+    UX_RENDER       = 0
+    UX_POS          = 1
+    UX_ONCLICK      = 2
+    UX_ONHOVER      = 3
+    UX_ALLOWDRAG    = 4
+    UX_ALLOWSLIDE   = 5
+    
