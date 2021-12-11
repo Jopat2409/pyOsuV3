@@ -14,7 +14,9 @@ import sys                                  # for exiting game
 import checksumdir                          # for getting hash of beatmap files
 
 
-
+"""
+Encapsulates the functions of the beatmap selection gamestate
+"""
 class gsBeatmapSelect:
 
     def __init__(self, parentClass):
@@ -24,33 +26,16 @@ class gsBeatmapSelect:
 
         # store a pointer to the sound handler
         self.soundHandler = parentClass.soundStream
-
         # array of beatmaps
         self.beatmaps = []
-
-        # gamestate Unique identifier
-        self.UUID = "gsBeatmapSelect"
-
-
-        
-        # gets the current osu multiplayer background
-        bgPath = config.DEFAULT_PATH + '/assets/bg/online_background_68261587a4e3fbe77cad07120ee1e864.jpg'
-        # load the background intoa pygame
-        bg = pygame.image.load(bgPath)
-        # scale it to the size of the screen
-        self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
-
-        
+        # initializes the bounds array of the beatmap
         self.beatmapBounds = []
 
-        # hard coded number representing how many beatmaps are shown on screen at once
-        self.BMS = 7                # beatmaps per screen
-        self.bmHeight = 150         # height of beatmap
-        self.bmMargin = 10          # space between beatmaps
-        self.bmOffset = 15          # offset from side of container
-    
-        # previous y coordinate of the mouse, used to scroll through beatmaps
-        self.prevMY = 0
+        # load the background intoa pygame
+        bg = pygame.image.load(config.DEFAULT_PATH + '/assets/bg/online_background_68261587a4e3fbe77cad07120ee1e864.jpg')
+        # scale it to the size of the screen
+        self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
+        
 
         # hard coded integers to do with movement of beatmap container
         self.offset = 0             # current offset of the beatmap array
@@ -59,6 +44,7 @@ class gsBeatmapSelect:
         self.velTotal = 0           # used for smooth scrolling
         self.velCount = 0           # used for smooth scrolling
         self.velY = 0               # current velocity of the beatmap container
+        self.prevMY = 0             # previous mouse y position
         self.decel = 1              # current decelleration
         self.decelCount = 0         # used for smooth scrolling
         self.maxMouseMovement = 5   # how much mouse input is considerd when decelerating
