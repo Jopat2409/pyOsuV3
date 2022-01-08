@@ -5,10 +5,6 @@ import BeatmapFrame                         # for getting the current beatmap in
 import pygame                               # for rendering
 import pygame.gfxdraw                       # for anti-aliased rendering
 
-
-
-
-
 """
 Encapsulates the render function and data storage of a hit circle
 Originally planned to be more data oriented, may implement in future
@@ -36,7 +32,6 @@ class hitCircle:
             # draw 5 circles incrememntally smaller, as pygame does not have a feature for thickness on circles
             pygame.gfxdraw.aacircle(surface, self.x, self.y, aOffset+i, BeatmapFrame.currentComboColor)
        
-
 """
 Encapsulates the render function and data storage of a slider object
 Originally planned to be more data oriented, may implement in future
@@ -102,8 +97,8 @@ class slider:
             # draw a bezier curve using the points
             pygame.gfxdraw.bezier(surface, self.points, 5, (255,255,255))
             
-
-"""Encapsulates the render function and data storage of a spinner object
+"""
+Encapsulates the render function and data storage of a spinner object
 Originally planned to be more data oriented, may implement in future
 """
 class spinner:

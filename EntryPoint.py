@@ -1,15 +1,14 @@
 """ ---------- OSU MODULES ---------- """
-import config                               # for program global variables
+import config  # for program global variables
 
 """ ---------- PYTHON MODULES ---------- """
-import os                                   # for joining directories
-import ctypes                               # for btypassing windows' UI scaling
-from win32api import GetSystemMetrics       # for getting system resolution
-import logging                              # for logging errors 
-import sys                                  # for exiting program
-import glob                                 # for finding cfg file 
-from shutil import copyfile                 # for copying cfg file
-
+import os  # for joining directories
+import ctypes  # for bypassing windows' UI scaling
+from win32api import GetSystemMetrics  # for getting system resolution
+import logging  # for logging errors
+import sys  # for exiting program
+import glob  # for finding cfg file
+from shutil import copyfile  # for copying cfg file
 
 """
 This class is for the initialization of the game, setting default variables settings
@@ -19,8 +18,7 @@ Since it is only ever called once there is no point in having it be a gamestate
 
 # loads the user's saved settings from their config file
 def loadSettings():
-
-    if not os.path.isfile("%s/osu!.cfg"%config.DEFAULT_PATH):
+    if not os.path.isfile("%s/osu!.cfg" % config.DEFAULT_PATH):
         # get the path of the user's local installation file
         osuPath = os.path.join(os.getenv('LocalAppData'), "osu!")
         # check if it exists, if not then exit as we cannot extract the needed data
@@ -32,10 +30,9 @@ def loadSettings():
             # copy the first cfg file found to "osu!.cfg" then break out of the for loop
             copyfile(os.join(osuPath, file), os.join(config.DEFAULT_PATH, "osu!.cfg"))
             break
-        
 
     # loop through all lines in the config file
-    with open("%s/osu!.cfg"%config.DEFAULT_PATH, "r", encoding='utf-8') as f:
+    with open("%s/osu!.cfg" % config.DEFAULT_PATH, "r", encoding='utf-8') as f:
         for line in f:
             # split the line into a list laid out in the form ["setting", "value"]
             cLine = line.split("=")
@@ -46,37 +43,34 @@ def loadSettings():
                     # this is due to keys doing different things in different gamestates
                     if cLine[1].strip() in config.keyBindings:
                         config.keyBindings[cLine[1].strip()].append(cLine[0].strip())
-                    else:  
-                        config.keyBindings.update({cLine[1].strip():[cLine[0].strip()]})
+                    else:
+                        config.keyBindings.update({cLine[1].strip(): [cLine[0].strip()]})
                 # if the line does not contain a key binding, put it into the currentSettings dictionary
                 else:
-                    config.currentSettings.update({cLine[0].strip():cLine[1].strip()})
+                    config.currentSettings.update({cLine[0].strip(): cLine[1].strip()})
     # set the scaling value which is used to scale osuPixel values
     config.CURRENT_SCALING = getOsuPixelScaling()
-    config.SCALED_RESOLUTION = (int(config.DEFAULT_RESOLUTION[0]*config.CURRENT_SCALING), int(config.DEFAULT_RESOLUTION[1]*config.CURRENT_SCALING))
-    #print(config.SCREEN_RESOLUTION)
-    #print(config.CURRENT_SCALING)
+    config.SCALED_RESOLUTION = (int(config.DEFAULT_RESOLUTION[0] * config.CURRENT_SCALING),
+                                int(config.DEFAULT_RESOLUTION[1] * config.CURRENT_SCALING))
+    # print(config.SCREEN_RESOLUTION)
+    # print(config.CURRENT_SCALING)
 
 
 def getOsuPixelScaling():
-
     # get the scale factor between the current height and the default height (480)
-    cScale = (config.SCREEN_RESOLUTION[1]-100) / config.DEFAULT_RESOLUTION[1]
+    cScale = (config.SCREEN_RESOLUTION[1] - 100) / config.DEFAULT_RESOLUTION[1]
     # check to make sure that scaling to this height would not cause the beatmap pane to bleed over the edge of the screen
     if (cScale * config.DEFAULT_RESOLUTION[0]) > config.SCREEN_RESOLUTION[0]:
         # update the cScale if that would be a problem
         cScale = config.SCREEN_RESOLUTION / config.DEFAULT_RESOLUTION[0]
-    #print("OsuPixelScale: " + str(cScale))
+    # print("OsuPixelScale: " + str(cScale))
     return cScale
 
 
-
-
 def startGame():
-
     try:
         import pygame
-        if(pygame.version.vernum[0]) < 2:
+        if (pygame.version.vernum[0]) < 2:
             print("You do not have the correct version of pygame installed, try installing pygame 2 and try again")
             return
     except ModuleNotFoundError:
@@ -107,23 +101,21 @@ def startGame():
     except ModuleNotFoundError:
         print("You do not have the correct pygame modules.... Closing program")
     config.titleFont = pygame.freetype.Font(os.path.join(config.cAssetDirectory, "font/AllerDisplay.ttf"))
-    
-    
-    
-    
+
     # set the mouse cursor to invisible due to the program using it's own cursor
     pygame.mouse.set_visible(False)
-    config.xOffset = int((config.SCREEN_RESOLUTION[0] - config.SCALED_RESOLUTION[0])/2)
-    config.yOffset = int(50*config.CURRENT_SCALING)
-    print(f"Main width: {config.SCREEN_RESOLUTION[0]}, Scaled Width:{config.SCALED_RESOLUTION[0]}, X offset: {config.xOffset}")
-    #print(config.keyBindings)
+    config.xOffset = int((config.SCREEN_RESOLUTION[0] - config.SCALED_RESOLUTION[0]) / 2)
+    config.yOffset = int(50 * config.CURRENT_SCALING)
+    print(
+        f"Main width: {config.SCREEN_RESOLUTION[0]}, Scaled Width:{config.SCALED_RESOLUTION[0]}, X offset: {config.xOffset}")
+    # print(config.keyBindings)
     # we import maingame here as many for the links to assets will not work without being initialized first
     import MainGame
-    
+
     # start the main program
     currentProcess = MainGame.osuGame()
 
-    
+
 # start the whole program if this file is directly ran
 if __name__ == "__main__":
     ans = str(input("Run in safe mode? y/n "))

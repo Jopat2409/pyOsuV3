@@ -12,6 +12,7 @@ import math                                 # for rounding
 import time                                 # for syncing beatmap and audio
 import sys                                  # for exiting game
 import checksumdir                          # for getting hash of beatmap files
+import MainMenu
 
 
 """
@@ -45,12 +46,16 @@ class gsBeatmapSelect:
         self.velCount = 0           # used for smooth scrolling
         self.velY = 0               # current velocity of the beatmap container
         self.prevMY = 0             # previous mouse y position
-        self.decel = 1              # current decelleration
+        self.decel = 1              # current deceleration
         self.decelCount = 0         # used for smooth scrolling
         self.maxMouseMovement = 5   # how much mouse input is considerd when decelerating
 
-        # intialize the default font
+        self.KEY_MAP = {"keyPause":self.goBack}
+
+        # initialize the default font
         self.font = pygame.font.SysFont('Arial', 25)
+        # create the frame that holds the beatmap selection buttons
+        self.beatmapFrame = pygame.Surface((config.SCREEN_RESOLUTION[0] / 3, config.SCREEN_RESOLUTION[1]), pygame.SRCALPHA, 32).convert_alpha()
 
         # initialize the timer for timing how long it takes to load beatmaps
         bmLoadStart = time.time()
@@ -93,6 +98,8 @@ class gsBeatmapSelect:
         # points to the current index of the beatmap currently selected
         self.cBeatmap = -1
 
+    def goBack(self):
+        self.parentClass.newGamestate(MainMenu.gsMenu(self.parentClass))
     """
     Called when the mouse button is pressed down
     """
@@ -227,14 +234,12 @@ class gsBeatmapSelect:
     """
     Render the beatmap rectangles
     surface: surface for the beatmap bounding surface to be blitted to
-    NOTE need to update this method in proto2 
+    NOTE need to update this method in prototype 2 
     """
     def drawBeatmapRects(self, surface):
 
-        bmNumber = -1                       # initialize the beatmap number to be -1
-        for beatmap in self.beatmapBounds:
-            # incremembt the beatmap index
-            bmNumber += 1
+        for bmNumber,beatmap in enumerate(self.beatmapBounds):
+            # increment the beatmap index
             # break out of for loop once all on screen beatmaps have been drawn
             if beatmap[1] + self.offset > config.SCREEN_RESOLUTION[1]:
                 break
@@ -270,13 +275,10 @@ class gsBeatmapSelect:
         if config.safeMode:
             tempSurface.fill((150,150,150))
 
-        # create the frame that holds the beatmap selection buttons
-        beatmapFrame = pygame.Surface((config.SCREEN_RESOLUTION[0] / 3, config.SCREEN_RESOLUTION[1]), pygame.SRCALPHA, 32)
-        beatmapFrame.convert_alpha()
-        
+        # reset the surface to a clear blank surface
+        self.beatmapFrame.fill(0)
         # blit the beatmap rectangles onto the frame
-        self.drawBeatmapRects(beatmapFrame)
-
+        self.drawBeatmapRects(self.beatmapFrame)
         # blit the beatmap frame onto the main surface
-        tempSurface.blit(beatmapFrame, ((config.SCREEN_RESOLUTION[0] / 3)*2,0))
+        tempSurface.blit(self.beatmapFrame, ((config.SCREEN_RESOLUTION[0] / 3)*2,0))
 

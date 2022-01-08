@@ -17,8 +17,6 @@ multi: wether multiplayer is enabled
 """
 class gsBeatmapPlayer:
 
-
-
     def __init__(self, PATH, parentClass, multi=False):
         # create the temporary path
         self.tempPath = PATH
@@ -32,35 +30,18 @@ class gsBeatmapPlayer:
         # parse the full beatmap
         self.hitObjects = BeatmapParse.fullParse(self.playingBeatmap["osuPath"])
 
-        # initialize the offset time used for correct pausing and resuming
-        self.pausedTime = 0
-        self.offsetTime = 0
-
-        # initialize the isMulti bool
-        self.isMulti = multi
         
-        # calculate all necessary values for the map, such as relative circle size, approach rate in ms etc
-        self.getMapValues()
-
-        # load and display the background image assigned to the map
-        PATH = os.path.join(self.playingBeatmap["BasePath"],self.playingBeatmap["BackgroundImage"])
-        PATH = PATH.replace("\\","/")
-        bg = pygame.image.load(PATH.strip()).convert()
-        # transform the image to the size of the screen currently
-        self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
-
+        self.pausedTime = 0     # time the game was paused
+        self.offsetTime = 0     # cumulative offset time (caused by pauses)
+        self.isMulti = multi    # isMultiplayer
         # initialize the font used throught the map
         self.cFont = pygame.font.SysFont('Arial', 40)
-
         # mapping all key presses to their respective functions
         self.KEY_MAP = {"keyOsuLeft":self.hasHitNextNote,
                                "keyOsuRight":self.hasHitNextNote,
                                "keyPause":self.pauseMap}
         # mapping the buttons to their respective button functions
         self.buttonFunct = [self.pauseMap, self.retry, self.parent.resumeGamestate]
-
-        
-
         # holds the value of the current combo held by the player
         self.combo = 0
         # holds the value of the maximum combo achieved by the player
@@ -74,6 +55,16 @@ class gsBeatmapPlayer:
         self.hitTimings = []
         # holds wether or not the map is paused
         self.isPaused = False
+        self.getMapValues()     # Calculate all necessary map values
+
+        # load and display the background image assigned to the map
+        PATH = os.path.join(self.playingBeatmap["BasePath"],self.playingBeatmap["BackgroundImage"])
+        PATH = PATH.replace("\\","/")
+        bg = pygame.image.load(PATH.strip()).convert()
+        # transform the image to the size of the screen currently
+        self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
+
+
 
         # if multiplayer is enabled
         if self.isMulti:
@@ -159,6 +150,7 @@ class gsBeatmapPlayer:
             """ If the approach rate is greater than 5, the formula is 800-500*(appraoch rate - 5) / 5"""
             self.fadeInTime = int(800 - 500*((float(self.playingBeatmap["ApproachRate"])-5)/5))
             BeatmapFrame.fadeInStart = int(1200 - 750*((float(self.playingBeatmap["ApproachRate"])-5)/5))
+            
         # calculate the outer radius of the circle based on the current circle size
         BeatmapFrame.circleSize = int(config.CURRENT_SCALING*(54.4-4.48*float(self.playingBeatmap["CircleSize"])))
         BeatmapFrame.approachCircleSize = BeatmapFrame.circleSize*2
@@ -268,7 +260,8 @@ class gsBeatmapPlayer:
     def getRenderSnapshot(self, interpolation, tempSurface):
 
         # fill the surface with black
-        tempSurface.fill((0,0,0))
+        #tempSurface.fill((0,0,0))
+        tempSurface.blit(self.bgIMG, (0,0))
         # initialize the combo
         combo = 0
         # get the current song position
