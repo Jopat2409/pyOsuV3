@@ -1,22 +1,60 @@
 root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 125, in handleInput
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
     self.gsManager.cGamestate.mButtonDown()
 AttributeError: 'gsMenu' object has no attribute 'mButtonDown'
 
 root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 111, in handleInput
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 110, in handleInput
     self.gsManager.cGamestate.mButtonUp()
 AttributeError: 'gsMenu' object has no attribute 'mButtonUp'
 
 root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 125, in handleInput
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
     self.gsManager.cGamestate.mButtonDown()
 AttributeError: 'gsMenu' object has no attribute 'mButtonDown'
 
 root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 111, in handleInput
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 110, in handleInput
     self.gsManager.cGamestate.mButtonUp()
 AttributeError: 'gsMenu' object has no attribute 'mButtonUp'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 101, in handleInput
+    self.gsManager.mapInput(config.keyBindings[pygame.key.name(event.key).capitalize()])
+KeyError: 'Left meta'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
+    self.gsManager.cGamestate.mButtonDown()
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'mButtonDown'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'buttons'
 
 root - WARNING - Traceback (most recent call last):
   File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 151, in mapInput
@@ -24,39 +62,281 @@ root - WARNING - Traceback (most recent call last):
 KeyError: 'keyPause'
 
 root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 125, in handleInput
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
     self.gsManager.cGamestate.mButtonDown()
-AttributeError: 'gsMenu' object has no attribute 'mButtonDown'
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'mButtonDown'
 
 root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 111, in handleInput
-    self.gsManager.cGamestate.mButtonUp()
-AttributeError: 'gsMenu' object has no attribute 'mButtonUp'
-
-root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 125, in handleInput
-    self.gsManager.cGamestate.mButtonDown()
-AttributeError: 'gsMenu' object has no attribute 'mButtonDown'
-
-root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 111, in handleInput
-    self.gsManager.cGamestate.mButtonUp()
-AttributeError: 'gsMenu' object has no attribute 'mButtonUp'
-
-root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 117, in handleInput
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
     self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 167, in checkButtonBounds
-    if button.checkBounds(pos):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainMenu.py", line 126, in checkBounds
-    self.functions[i]()
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainMenu.py", line 63, in optionAI
-    self.parentClass.newGamestate(AiGamestate.gsNeuralNetworkTrain(self.parentClass))
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\AiGamestate.py", line 57, in __init__
-    self.cButtonWrapper = pickButtonClass(self)
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\AiGamestate.py", line 35, in __init__
-    self.buttonFunc = [self.play, self.train]
-AttributeError: 'pickButtonClass' object has no attribute 'play'
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
+    self.gsManager.cGamestate.mButtonDown()
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'mButtonDown'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
+    self.gsManager.cGamestate.mButtonDown()
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'mButtonDown'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 151, in mapInput
+    self.GLOBAL_KEY_MAP[inputEvent]()
+KeyError: 'keyPause'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
+    self.gsManager.cGamestate.mButtonDown()
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'mButtonDown'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
+    self.gsManager.cGamestate.mButtonDown()
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'mButtonDown'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 151, in mapInput
+    self.GLOBAL_KEY_MAP[inputEvent]()
+KeyError: 'keyPause'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
+    self.gsManager.cGamestate.mButtonDown()
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'mButtonDown'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 101, in handleInput
+    self.gsManager.mapInput(config.keyBindings[pygame.key.name(event.key).capitalize()])
+KeyError: 'Left meta'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 151, in mapInput
+    self.GLOBAL_KEY_MAP[inputEvent]()
+KeyError: 'keyPause'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
+    self.gsManager.cGamestate.mButtonDown()
+AttributeError: 'gsBeatmapPlayer' object has no attribute 'mButtonDown'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 116, in handleInput
+    self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 166, in checkButtonBounds
+    for button in self.cGamestate.buttons:
+AttributeError: 'gsBeatmapSelect' object has no attribute 'buttons'
+
+root - WARNING - Traceback (most recent call last):
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 151, in mapInput
+    self.GLOBAL_KEY_MAP[inputEvent]()
+KeyError: 'keyPause'
 
 root - WARNING - Traceback (most recent call last):
   File "C:\Users\Joe\Documents\GitHub\pyOsuV3\GameState.py", line 151, in mapInput
@@ -69,32 +349,22 @@ root - WARNING - Traceback (most recent call last):
 KeyError: 'keyPause'
 
 root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 125, in handleInput
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
     self.gsManager.cGamestate.mButtonDown()
 AttributeError: 'gsMenu' object has no attribute 'mButtonDown'
 
 root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 111, in handleInput
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 110, in handleInput
     self.gsManager.cGamestate.mButtonUp()
 AttributeError: 'gsMenu' object has no attribute 'mButtonUp'
 
 root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 125, in handleInput
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 124, in handleInput
     self.gsManager.cGamestate.mButtonDown()
 AttributeError: 'gsMenu' object has no attribute 'mButtonDown'
 
 root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 111, in handleInput
-    self.gsManager.cGamestate.mButtonUp()
-AttributeError: 'gsMenu' object has no attribute 'mButtonUp'
-
-root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 125, in handleInput
-    self.gsManager.cGamestate.mButtonDown()
-AttributeError: 'gsMenu' object has no attribute 'mButtonDown'
-
-root - WARNING - Traceback (most recent call last):
-  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 111, in handleInput
+  File "C:\Users\Joe\Documents\GitHub\pyOsuV3\MainGame.py", line 110, in handleInput
     self.gsManager.cGamestate.mButtonUp()
 AttributeError: 'gsMenu' object has no attribute 'mButtonUp'
 

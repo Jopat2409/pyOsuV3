@@ -2,25 +2,23 @@ import pygame
 from UiObjects import FLAGS as flags
 import os
 
+
 class UidGenerator:
 
     def __init__(self, UID_LENGTH=6):
-
         self.UID_LENGTH = UID_LENGTH
 
         self._usableIds = [str(1).zfill(self.UID_LENGTH)]
 
     def getNextId(self):
-
         nextId = self._usableIds.pop()
         if not self._usableIds:
-            self._usableIds.append(str(int(nextId)+1).zfill(self.UID_LENGTH))
+            self._usableIds.append(str(int(nextId) + 1).zfill(self.UID_LENGTH))
         return nextId
 
     def returnId(self, _id):
-
         self._usableIds.append(_id)
-        
+
 
 class UiHandler:
 
@@ -31,11 +29,12 @@ class UiHandler:
         # self._components[flags.COMPONENT] = {id:component}
         self._components = [{} for flag in flags]
 
-        self.defaultTexture = pygame.image.load(os.path.join("c:/Users/Joe/Documents/GitHub/pyOsuV3/UiManager/","assets", "ape.jpg")).convert()
+        self.defaultTexture = pygame.image.load(
+            os.path.join("c:/Users/Joe/Documents/GitHub/pyOsuV3/UiManager/", "assets", "ape.jpg")).convert()
 
-        self.eventMap ={
-            pygame.MOUSEBUTTONUP:self.onMouseRelease,
-            pygame.MOUSEBUTTONDOWN:self.onMousePress
+        self.eventMap = {
+            pygame.MOUSEBUTTONUP: self.onMouseRelease,
+            pygame.MOUSEBUTTONDOWN: self.onMousePress
 
         }
 
@@ -49,12 +48,13 @@ class UiHandler:
     customRect: used for scaling
     SHOW: used for default showing status
     """
+
     def addElement(self, imageUrl, position, customRect=None, SHOW=1):
 
         # generate an id for the element
         newId = self.ID_GEN.getNextId()
-        
-        #try and load the image provided
+
+        # try and load the image provided
         try:
             image = pygame.image.load(imageUrl).convert()
         except FileNotFoundError:
@@ -66,30 +66,25 @@ class UiHandler:
                 image = pygame.image.transform(self.defaultTexture, (customRect.w, customRect.h))
 
         # add the render component for rednering the ui object
-        self._components[flags.UX_RENDER].update({newId:[image,position,SHOW]})
+        self._components[flags.UX_RENDER].update({newId: [image, position, SHOW]})
         # add the position element for detecting collisions
-        self._components[flags.UX_POS].update({newId:image.get_rect()})
-        
-    
+        self._components[flags.UX_POS].update({newId: image.get_rect()})
+
         # return the new Id to the user so they can manipulate the element later
         return newId
-    
 
     def handleEvent(self, pygameEvent):
 
         eventType = pygameEvent.type
         if eventType in self.eventMap:
             self.eventMap[eventType]()
-        
-
 
     def addEvent(self, _id, eventFlag, eventData):
 
         if eventFlag not in flags:
             return
-        
-        self._components[eventFlag].update({_id:eventData})
-    
+
+        self._components[eventFlag].update({_id: eventData})
 
     def render(self, surface):
 
@@ -98,13 +93,13 @@ class UiHandler:
                 surface.blit(_object[0], _object[1])
 
     def update(self):
-        
+
         if self.checkMouseMove():
             self.getActiveMouseComponent()
             self.onMouseMove()
-        
-        
+
     """ -------------- FUNCTIONS TO DO WITH MOUSE INPUT HANDLING -----------------"""
+
     def onMousePress(self):
         pass
 
@@ -122,10 +117,11 @@ class UiHandler:
         else:
             self.lastMousePos = mousePos
             return True
-    
+
     """
     Gets the current component that is applicable to mouse functions
     """
+
     def getActiveMouseComponent(self):
         # get the current mouse position
         currentMousePos = pygame.mouse.get_pos()
@@ -141,8 +137,5 @@ class UiHandler:
                 return
 
         self.activeMouseComponent = None
-    
-
 
     """ --------------------------------------------------------------------------"""
-

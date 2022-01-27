@@ -153,7 +153,8 @@ class gsBeatmapSelect:
             tempX, tempY = pygame.mouse.get_pos()
             # idk what this does but it works
             mDiff = abs((tempX - self.prevMousePos[0]) ^ 2 + (tempY - self.prevMousePos[1]) ^ 2)
-            # if the difference in position is less that the minimum required (prevents accidentally scrolling rather than clicking)
+            # if the difference in position is less that the minimum required (prevents accidentally scrolling rather
+            # than clicking)
             if mDiff <= self.maxMouseMovement ^ 2:
                 self.scrolling = False
                 self.decelerating = False
@@ -185,7 +186,7 @@ class gsBeatmapSelect:
             # get the y position of the beatmap
             bmOffset = beatmap[1] + self.offset
             # if the mouse y position intersects
-            if mY >= bmOffset and mY <= (bmOffset + self.bmHeight):
+            if bmOffset <= mY <= (bmOffset + self.bmHeight):
                 # if this beatmap is already selected
                 if self.cBeatmap == bmCount:
                     # pause the gamestate with a new beatmapPlay gamestate
@@ -201,7 +202,7 @@ class gsBeatmapSelect:
                         int(self.beatmaps[bmCount]["PreviewTime"]))
                     # create the path to the background image
                     PATH = os.path.join(self.beatmaps[bmCount]["BasePath"], self.beatmaps[bmCount]["BackgroundImage"])
-                    # fixes issues with permissions
+                    # Fix issues with permissions
                     PATH = PATH.replace("\\", "/")
                     # load the image
                     bg = pygame.image.load(PATH.strip())

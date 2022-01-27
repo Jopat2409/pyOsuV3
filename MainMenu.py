@@ -133,13 +133,26 @@ class gsMenu:
 
         # set the background image
         images = glob.glob(os.path.join(config.DEFAULT_PATH, "assets/bg", "*.jpg"))
-        imgToRender = os.path.join(config.DEFAULT_PATH, "assets/bg", random.choice(images))
 
+        backgroundImg = os.path.join(config.DEFAULT_PATH, "assets/bg", random.choice(images))
         # scale the image to the size of the screen
-        bg = pygame.image.load(imgToRender).convert()
+        bg = pygame.image.load(backgroundImg).convert()
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
-        # create the shaded bars at the top and bottom of the screen where information goes
+
         self.tempRectHeight = int(config.SCREEN_RESOLUTION[1] / 8)
+        try:
+            profileImage = os.path.join(config.DEFAULT_PATH, "assets/user", "ProfilePicture.jpg")
+        except FileNotFoundError:
+            try:
+                profileImage = os.path.join(config.DEFAULT_PATH, "assets/user", "ProfilePicture.png")
+            except FileNotFoundError:
+                profileImage = None
+        if profileImage:
+            pfp = pygame.image.load(profileImage).convert()
+            self.ProfileImage = pygame.transform.scale(pfp, (self.tempRectHeight - 20, self.tempRectHeight - 20))
+
+        # create the shaded bars at the top and bottom of the screen where information goes
+
         self.uiRect = pygame.Surface((config.SCREEN_RESOLUTION[0], self.tempRectHeight)).convert_alpha()
         self.uiRect.set_alpha(125)
         # get a reference to the parent gamestatemanager class
@@ -170,6 +183,8 @@ class gsMenu:
 
         # blit the two rectangles that make the UI look cleaner
         tempSurface.blit(self.uiRect, (0, 0))
+        if self.ProfileImage:
+            tempSurface.blit(self.ProfileImage, (10, 10))
         tempSurface.blit(self.uiRect, (0, config.SCREEN_RESOLUTION[1] - self.tempRectHeight))
 
         # tempSurface.fill((200,0,200))
