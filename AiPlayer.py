@@ -2,8 +2,6 @@
 import osrparse
 import config
 
-""" ---------- PYTHON MODULES ---------- """
-from time import time
 
 """
 Class for playing replay fliles (.osr files)
@@ -16,6 +14,8 @@ class ArtificialIntelligence:
 
     def __init__(self, network, beatmapFile):
         # wether the replay file has been loaded fully
+        self.mouseData = None
+        self.replay = None
         self.isReady = False
         # create the replay object from the file
         self.createReplay(beatmapFile)
@@ -120,7 +120,7 @@ class ArtificialIntelligence:
             print(f"{pMData.y} ---- {xDiff} ---- {cMData.y}\n")
 
         # return a tuple containing the x difference and the y difference
-        return (xDiff, yDiff)
+        return xDiff, yDiff
 
     def generateData(self, beatmap):
         return "replaydata/WhitecatFool.osr"

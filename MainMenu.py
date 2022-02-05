@@ -4,22 +4,19 @@ import AiGamestate  # for next gamestate
 import BeatmapSelect  # for next gamestate
 
 """ ---------- PYTHON MODULES ---------- """
-import pygame  # for rendering
-import pygame.gfxdraw  # for anti-aliased rendering
-import math  # for rounding
-import sys  # for exiting program
-import glob  # for getting background image
-import random  # for getting background image
-import os  # for joining paths
-
-"""
-Class for handling the main UI section of the gamestate
-need to change this and implement a UI manager
-"""
+import pygame               # for rendering
+import pygame.gfxdraw       # for anti-aliased rendering
+import math                 # for rounding
+import glob                 # for getting background image
+import random               # for getting background image
+import os                   # for joining paths
 
 
 class MainButton:
-
+    """
+    Class for handling the main UI section of the gamestate
+    need to change this and implement a UI manager
+    """
     def __init__(self, parent):
 
         # ---------- DEFINING SCALED DIMENSIONS ----------- #
@@ -43,30 +40,30 @@ class MainButton:
         # get instance of parent class
         self.parentClass = parent
 
-        # tracks whether or not the center button has been pressed
+        # tracks whether the center button has been pressed
         self.active = False
 
-    """
-    Changes gamestate
-    """
-
     def optionPlay(self):
+        """
+        Changes gamestate
+        """
         # switch to the beatmap selection gamestate
         self.parentClass.newGamestate(BeatmapSelect.gsBeatmapSelect(self.parentClass))
 
-    """
-    Changes gamestate
-    """
+
 
     def optionAI(self):
-        # sets the gamestate to the ai interface gamestate
-        self.parentClass.newGamestate(AiGamestate.gsNeuralNetworkTrain(self.parentClass))
+        """
+        Changes gamestate
+        """
+        # sets the gamestate to the AI interface gamestate
+        self.parentClass.newGamestate(AiGamestate.gsNeuralConfig(self.parentClass))
 
-    """
-    Exits the whole program
-    """
-
-    def exit(self):
+    @staticmethod
+    def exit():
+        """
+        Exits the whole program
+        """
         # exit out of the game
         config.isRunning = False
 
@@ -105,6 +102,10 @@ class MainButton:
             # render the main osu button at an offset
             pygame.gfxdraw.filled_circle(surface, self.pos[0] - 300, self.pos[1], self.radius, config.WHITE)
             pygame.gfxdraw.filled_circle(surface, self.pos[0] - 300, self.pos[1], self.rRadius, config.PINK)
+            text_rect = config.titleFont.get_rect("OSU!ai", size=int(65 * config.CURRENT_SCALING))
+            text_rect.center = (self.pos[0] - 300, self.pos[1])
+            config.titleFont.render_to(surface, text_rect, "OSU!ai", (255, 255, 255),
+                                       size=int(65 * config.CURRENT_SCALING))
 
     def checkBounds(self, pos):
         # check if the mouse is within the bounds of the main button if it is not already active
@@ -131,6 +132,7 @@ class gsMenu:
 
     def __init__(self, parent):
 
+        self.soundHandler = parent.soundStream
         # set the background image
         images = glob.glob(os.path.join(config.DEFAULT_PATH, "assets/bg", "*.jpg"))
 
@@ -138,6 +140,16 @@ class gsMenu:
         # scale the image to the size of the screen
         bg = pygame.image.load(backgroundImg).convert()
         self.bgIMG = pygame.transform.scale(bg, config.SCREEN_RESOLUTION)
+
+        # get the current song to play
+        if not self.soundHandler.IsPlayingSong():
+            cSong = os.path.join(config.DEFAULT_PATH, "beatmaps",
+                                 random.choice(os.listdir("%s/beatmaps/" % config.DEFAULT_PATH)))
+            print(cSong)
+            self.m_cSong = random.choice(glob.glob(os.path.join(cSong, "*.mp3")))
+            self.soundHandler.playSong(self.m_cSong)
+            print(self.m_cSong)
+
 
         self.tempRectHeight = int(config.SCREEN_RESOLUTION[1] / 8)
         try:
@@ -177,7 +189,7 @@ class gsMenu:
         if config.safeMode:
             tempSurface.fill((150, 150, 150))
 
-        # render all of the objects
+        # render all the objects
         for _object in self.buttons:
             _object.render(tempSurface)
 

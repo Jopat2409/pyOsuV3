@@ -2,14 +2,19 @@
 
 DEFAULT_PATH = ""
 CURRENT_SCALING = 1
+SCREEN_RESOLUTION = ()
+DEFAULT_RESOLUTION = ()
 xOffset = 0
 yOffset = 0
 keyBindings = {}
 currentSettings = {}
-
+cAssetDirectory = ""
+SCALED_RESOLUTION = ()
 safeMode = False
-
+isRunning = False
+titleFont = None
 useOsuTextures = True
+cSkinDirectory = ""
 
 currentMods = []
 

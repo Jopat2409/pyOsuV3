@@ -9,16 +9,16 @@ import pygame  # for rendering and sound
 import traceback  # for getting error messages
 import logging  # for logging errors
 
-"""
-This class holds all of the general information and functions used throughout the game, such as the gameloop,
-input handling methods and render/update methods
-"""
 
 
-class osuGame():
-
+class osuGame:
+    """
+    This class holds all the general information and functions used throughout the game, such as the gameloop,
+    input handling methods and render/update methods
+    """
     def __init__(self):
 
+        self.events = None
         # defines how many times per second the game updates
         self.MS_PER_UPDATE = 1 / 1000
         # initializes the class used for managing the current game state
@@ -32,13 +32,10 @@ class osuGame():
         # starts the game loop
         self.gameLoop()
 
-    def defunctFunct(self):
-        print("Worked")
 
-    """ The main gameloop of the program """
 
     def gameLoop(self):
-
+        """ The main gameloop of the program """
         # store the current time
         prevTime = time.time()
         # initialize lag to 0.0
@@ -46,7 +43,7 @@ class osuGame():
         # initialize the internal frame counters
         frames = 0
         updates = 0
-        # get the time since the program was ran
+        # get the time since the program was run
         pTime = time.perf_counter()
 
         # loop while running is true
@@ -69,7 +66,7 @@ class osuGame():
 
             # loop to ensure that the game updates at the correct tick rate as defined by MS_PER_UPDATE
             while lag >= self.MS_PER_UPDATE:
-                # handles inputs as many times per second as possible
+                # Handle inputs as many times per second as possible
                 self.handleInput()
                 # update the gamestate manager
                 self.gsManager.update()
@@ -77,7 +74,8 @@ class osuGame():
                 lag -= self.MS_PER_UPDATE
                 # increment the internal update counter
                 updates += 1
-            # render's the game as many times as possible per second, passing the time between updates to the renderer for linear interpolation
+            # render's the game as many times as possible per second, passing the time between updates to the
+            # renderer for linear interpolation
             self.gsManager.render(lag / self.MS_PER_UPDATE, self.frames)
             # increment the internal frame counter
             frames += 1
@@ -86,9 +84,9 @@ class osuGame():
         pygame.quit()
         sys.exit(0)
 
-    """ The function for handling game input """
 
     def handleInput(self):
+        """ The function for handling game input """
 
         # loops through all inputs
         for event in pygame.event.get():
@@ -114,12 +112,13 @@ class osuGame():
                 # try to call the checkButtonBounds function which checks to see if any buttons were pressed
                 try:
                     self.gsManager.checkButtonBounds(pygame.mouse.get_pos())
-                except:
+                except AttributeError:
                     # print(traceback.format_exc())
                     logging.warning(traceback.format_exc())
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                # try to call the mButtonDow function which is used for objects that require handling of mouse dragging (scrolling etc)
+                # try to call the mButtonDow function which is used for objects that require handling of mouse
+                # dragging (scrolling etc)
                 try:
                     self.gsManager.cGamestate.mButtonDown()
                 except AttributeError:

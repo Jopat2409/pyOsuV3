@@ -22,13 +22,13 @@ def loadSettings():
         # get the path of the user's local installation file
         osuPath = os.path.join(os.getenv('LocalAppData'), "osu!")
         # check if it exists, if not then exit as we cannot extract the needed data
-        if not os.isdir(osuPath):
+        if not os.path.isdir(osuPath):
             print("Cannot find a local installation of osu!.... ending program.")
             sys.exit(0)
         # loop through config files in the osu local path
-        for file in glob.glob(os.join(osuPath, "*.cfg")):
+        for file in glob.glob(os.path.join(osuPath, "*.cfg")):
             # copy the first cfg file found to "osu!.cfg" then break out of the for loop
-            copyfile(os.join(osuPath, file), os.join(config.DEFAULT_PATH, "osu!.cfg"))
+            copyfile(os.path.join(osuPath, file), os.path.join(config.DEFAULT_PATH, "osu!.cfg"))
             break
 
     # loop through all lines in the config file
@@ -37,10 +37,11 @@ def loadSettings():
             # split the line into a list laid out in the form ["setting", "value"]
             cLine = line.split("=")
             if len(cLine) != 1:
-                # if the line starts with "key" then it is a key binding which is saved in a different dictionary called keyBindings
+                # if the line starts with "key" then it is a key binding which is saved in a different dictionary
+                # called keyBindings
                 if cLine[0].startswith("key"):
-                    # checks to see if the key already has a function attached to it. If it does, it appends it to the list of functions
-                    # this is due to keys doing different things in different gamestates
+                    # checks to see if the key already has a function attached to it. If it does, it appends it to
+                    # the list of functions. This is due to keys doing different things in different gamestates
                     if cLine[1].strip() in config.keyBindings:
                         config.keyBindings[cLine[1].strip()].append(cLine[0].strip())
                     else:
@@ -59,7 +60,8 @@ def loadSettings():
 def getOsuPixelScaling():
     # get the scale factor between the current height and the default height (480)
     cScale = (config.SCREEN_RESOLUTION[1] - 100) / config.DEFAULT_RESOLUTION[1]
-    # check to make sure that scaling to this height would not cause the beatmap pane to bleed over the edge of the screen
+    # check to make sure that scaling to this height would not cause the beatmap pane to bleed over the edge of the
+    # screen
     if (cScale * config.DEFAULT_RESOLUTION[0]) > config.SCREEN_RESOLUTION[0]:
         # update the cScale if that would be a problem
         cScale = config.SCREEN_RESOLUTION / config.DEFAULT_RESOLUTION[0]
@@ -78,7 +80,7 @@ def startGame():
         return
     pygame.init()
     pygame.mixer.pre_init(44100, 16, 2, 4096)
-    # create the logger that will be used throught the program
+    # create the logger that will be used through the program
     logging.basicConfig(filename='log.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
     # prevent the program from scaling due to windows default UI scaling
     ctypes.windll.user32.SetProcessDPIAware()
@@ -102,18 +104,15 @@ def startGame():
         print("You do not have the correct pygame modules.... Closing program")
     config.titleFont = pygame.freetype.Font(os.path.join(config.cAssetDirectory, "font/AllerDisplay.ttf"))
 
-    # set the mouse cursor to invisible due to the program using it's own cursor
+    # set the mouse cursor to invisible due to the program using its own cursor
     pygame.mouse.set_visible(False)
     config.xOffset = int((config.SCREEN_RESOLUTION[0] - config.SCALED_RESOLUTION[0]) / 2)
     config.yOffset = int(50 * config.CURRENT_SCALING)
-    print(
-        f"Main width: {config.SCREEN_RESOLUTION[0]}, Scaled Width:{config.SCALED_RESOLUTION[0]}, X offset: {config.xOffset}")
-    # print(config.keyBindings)
     # we import maingame here as many for the links to assets will not work without being initialized first
     import MainGame
 
     # start the main program
-    currentProcess = MainGame.osuGame()
+    MainGame.osuGame()
 
 
 # start the whole program if this file is directly ran

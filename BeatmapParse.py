@@ -1,26 +1,25 @@
 """ ---------- OSU MODULES ---------- """
-import config
 import HitObject
+
 """ ---------- PYTHON MODULES ---------- """
 import re
 
 
-"""
-Only parses the necessary information for displaying the beatmap
-beatmapPath: path to the beatmap
-"""
 def shallowRead(beatmapPath, basePath):
-
+    """
+    Only parses the necessary information for displaying the beatmap
+    beatmapPath: path to the beatmap
+    """
     # stores the current section of the beatmap that is being parsed
     cSection = ""
     # handles what is left to be parsed
-    parsed = ["General","Metadata","Difficulty", "Events"]
+    parsed = ["General", "Metadata", "Difficulty", "Events"]
     # actual data that will be returned
     data = {}
     with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:
 
         # add the path of the beatmap to the data
-        data.update({"BasePath":basePath,"osuPath":beatmapPath})
+        data.update({"BasePath": basePath, "osuPath": beatmapPath})
 
         # loop through all the lines in the beatmap .osu
         for line in cBeatmap:
@@ -33,7 +32,7 @@ def shallowRead(beatmapPath, basePath):
             try:
                 # make the previous section the current section
                 prevS = cSection
-                #update the current section
+                # update the current section
                 cSection = tempSearch.group(1)
                 # if events has been parsed then return data
                 if prevS == "Events":
@@ -49,7 +48,7 @@ def shallowRead(beatmapPath, basePath):
             if cSection == "Metadata" or cSection == "Difficulty" or cSection == "General":
                 line = line.split(":")
                 try:
-                    data.update({line[0].strip():line[1].strip()})
+                    data.update({line[0].strip(): line[1].strip()})
                 except IndexError:
                     print("line" + str(line))
                 try:
@@ -58,23 +57,23 @@ def shallowRead(beatmapPath, basePath):
                     pass
             # add the background image to the data so that it can be rendered
             elif cSection == "Events" and ".jpg" in line:
-                data.update({"BackgroundImage":line.split(",")[2].replace('"','')})
+                data.update({"BackgroundImage": line.split(",")[2].replace('"', '')})
                 try:
                     parsed.remove(cSection)
                 except:
                     pass
 
-            
-"""
-Reads all the necessary data for the song to be played
-"""
+
+
 def fullParse(beatmapPath):
+    """
+    Reads all the necessary data for the song to be played
+    """
+    reading = False  # initializes the reading state to false
+    cSection = ""  # initializes the current section
+    combo = 0  # initializes the current combo
 
-    reading = False         # initializes the reading state to false
-    cSection = ""           # initializes the current section
-    combo = 0               # initializes the current combo
-
-    hitObjects = []         # initializes the hitObjects array
+    hitObjects = []  # initializes the hitObjects array
 
     # open the beatmap file with utf-8 encoding 
     with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:
@@ -95,7 +94,7 @@ def fullParse(beatmapPath):
             if cSection == "HitObjects":
                 # split the csv
                 tempObj = [i.strip() for i in line.split(",")]
-                
+
                 # split the bytecode that defines information about the hit object
                 osType = "{0:b}".format(int(tempObj[3]))
                 # get the type of the hitObject
@@ -108,27 +107,26 @@ def fullParse(beatmapPath):
                     if osType[i] == "1":
                         # add the index to the object parameters
                         objectParams.append(i)
-                if 0 in objectParams:                                   # 0 denotes a hit circle object
+                if 0 in objectParams:  # 0 denotes a hit circle object
                     hitObjects.append(HitObject.hitCircle(tempObj))
-                elif 1 in objectParams:                                 # 1 denotes a slider object
+                elif 1 in objectParams:  # 1 denotes a slider object
                     hitObjects.append(HitObject.slider(tempObj))
-                elif 3 in objectParams:                                 # 3 denotes a spinner object
+                elif 3 in objectParams:  # 3 denotes a spinner object
                     hitObjects.append(HitObject.spinner(tempObj))
     # return the hit objects array
     return hitObjects
 
-            
-"""
-Parse the beatmap for use within the 
-"""
-def aiParse(beatmapPath):
 
+
+def aiParse(beatmapPath):
+    """
+    Parse the beatmap for use within the
+    """
     reading = False
     cSection = ""
     combo = 0
 
     hitObjects = []
-
 
     with open(beatmapPath, 'r', encoding='utf-8') as cBeatmap:
 
@@ -144,7 +142,7 @@ def aiParse(beatmapPath):
             if cSection == "HitObjects":
                 # split the csv
                 tempObj = [i.strip() for i in line.split(",")]
-                
+
                 osType = "{0:b}".format(int(tempObj[3]))
                 osType = osType[::-1]
                 objectParams = []
@@ -156,13 +154,11 @@ def aiParse(beatmapPath):
                     tempObj.append(1)
                 else:
                     tempObj.append(0)
-                
+
                 if 3 in objectParams:
                     tempObj.append(1)
                 else:
                     tempObj.append(0)
                 hitObjects.append(tempObj)
-    
+
     return hitObjects
-        
-    
