@@ -2,6 +2,8 @@
 import config  # for program-global variables
 import BeatmapParse  # for parsing beatmaps
 import BeatmapPlay  # for playing beatmaps
+import MainMenu
+import Loading
 """ ---------- PYTHON MODULES ---------- """
 import pickle  # for serializing beatmaps
 import os  # for joining paths
@@ -10,7 +12,7 @@ import pygame  # for rendering
 import math  # for rounding
 import time  # for syncing beatmap and audio
 import checksumdir  # for getting hash of beatmap files
-import MainMenu
+
 
 """
 Encapsulates the functions of the beatmap selection gamestate
@@ -54,6 +56,9 @@ class gsBeatmapSelect:
         self.decelCount = 0  # used for smooth scrolling
         self.maxMouseMovement = 5  # how much mouse input is considerd when decelerating
 
+        self.m_lAnimState = 0
+        self.lX, self.lY = None, None
+
         self.KEY_MAP = {"keyPause": self.goBack}
 
         # initialize the default font
@@ -62,42 +67,9 @@ class gsBeatmapSelect:
         self.beatmapFrame = pygame.Surface((config.SCREEN_RESOLUTION[0] / 3, config.SCREEN_RESOLUTION[1]),
                                            pygame.SRCALPHA, 32).convert_alpha()
 
-        # initialize the timer for timing how long it takes to load beatmaps
-        bmLoadStart = time.time()
-        # checks for beatmap cache
-        cPath = config.DEFAULT_PATH + '\\.temp\\beatmapSelect.dat'
-        # checks to see if a beatmap cache already exists
-        if os.path.isfile(cPath):
-            # if it does, load the objects stored in at directory cPath as self.beatmaps
-            # read bytes of the cache file
-            with open(cPath, 'rb') as file:
-                # store the beatmap information
-                data = pickle.load(file)
-            # store the beatmap array in the current beatmap array
-            self.beatmaps = data[0]
-        else:
-            # if it does not exist
-            count = 0
-            bmParsed = []
-            # loop through all beatmap directories
-            for beatmap in os.listdir("%s/beatmaps/" % config.DEFAULT_PATH):
-                PATH = "%s\\beatmaps\\%s" % (config.DEFAULT_PATH, beatmap)
-                # append the checksum of the beatmap directory (used for loading when changed)
-                bmParsed.append(checksumdir.dirhash(PATH))
-                # loop through all .osu files in beatmap directory
-                for diff in glob.glob(PATH + "/" + "*.osu"):
-                    # parse .osu file and append it to list of beatmaps
-                    self.beatmaps.append(BeatmapParse.shallowRead(diff, PATH))
-                    count += 1
-            print(f"Loaded {count} new beatmaps!")
-            # writes it to cPath when all beatmaps are parsed
-            with open(cPath, 'wb') as beatmapFile:
-                tempData = (self.beatmaps, bmParsed)
-                pickle.dump(tempData, beatmapFile)
-        # calculate the bounds of all the buttons / beatmap selection buttons
-        self.calculateBmBounds()
-        # output the time taken to load the beatmaps (DEBUG)
-        print("It took {}s to load all beatmaps".format(time.time() - bmLoadStart))
+        self.m_loadThread = Loading.BeatmapLoader()
+        self.m_boundsCalc = False
+        self.beatmaps = {}
 
         # points to the current index of the beatmap currently selected
         self.cBeatmap = -1
@@ -123,6 +95,8 @@ class gsBeatmapSelect:
         """
         Called when the mouse button is pressed down
         """
+        if self.m_loadThread.is_alive():
+            return
         # get the current mouse position
         self.prevMousePos = pygame.mouse.get_pos()
         # unpack the tuple
@@ -155,6 +129,8 @@ class gsBeatmapSelect:
         """
         Runs when the mouse button is raised
         """
+        if self.m_loadThread.is_alive():
+            return
         # if the user is currently scrolling
         if self.scrolling:
             # unpack the mouse position
@@ -201,7 +177,7 @@ class gsBeatmapSelect:
                     # pause the gamestate with a new beatmapPlay gamestate we pause here as the information currently
                     # in the class needs to be respored once the song has finished
                     self.parentClass.pauseGamestate(
-                        BeatmapPlay.gsBeatmapPlayer(self.beatmaps[self.cBeatmap], self.parentClass, False))
+                        BeatmapPlay.gsBeatmapPlayer(self.beatmaps[self.cBeatmap], self.parentClass, True))
                 else:
                     # set the current beatmap to the beatmap
                     self.cBeatmap = bmCount
@@ -225,6 +201,13 @@ class gsBeatmapSelect:
         """
         Updates the gamestate
         """
+        if self.m_loadThread.is_alive():
+            pass
+        if not self.beatmaps:
+            self.beatmaps = self.m_loadThread.m_rValue.GetValue()
+            if self.beatmaps and not self.m_boundsCalc:
+                self.calculateBmBounds()
+                self.m_boundsCalc = True
         # if currently scrolling
         if self.scrolling:
             # set the current velocity to the difference between the current mouse position and the last mouse position
@@ -280,6 +263,23 @@ class gsBeatmapSelect:
             # blit the text onto the rectangle
             surface.blit(self.font.render(tempString, True, (0, 0, 0)), (rectX, int(beatmap[1] + self.offset)))
 
+    def RenderLoadScreen(self, surface):
+
+        surface.fill(0)
+        t_toRender = "Loading" + "."*self.m_lAnimState
+        text_rect = config.titleFont.get_rect(t_toRender, size=int(65 * config.CURRENT_SCALING))
+        if not self.lX or not self.lY:
+            # center the text on the main screen
+            text_rect.center = surface.get_rect().center
+            self.lX,self.lY = text_rect.x,text_rect.y
+        else:
+            text_rect.x, text_rect.y = self.lX, self.lY
+        
+        
+        # draw the text to the screen
+        config.titleFont.render_to(surface, text_rect, t_toRender, (255, 255, 255),
+                                   size=int(65 * config.CURRENT_SCALING))
+        self.m_lAnimState = (self.m_lAnimState+1)%4
 
     def getRenderSnapshot(self, interpolation, tempSurface):
         """
@@ -287,7 +287,11 @@ class gsBeatmapSelect:
         interpolation: ?
         tempSurface: surface to draw to
         """
-
+        
+        
+        if self.m_loadThread.is_alive():
+            self.RenderLoadScreen(tempSurface)
+            return
         # blit the backgroud image
         tempSurface.blit(self.bgIMG, (0, 0))
         # if safe mode is enabled, draw over the background image
